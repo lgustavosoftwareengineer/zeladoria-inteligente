@@ -1,0 +1,12 @@
+{
+  "name": "@zeladoria-inteligente/web",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Frontend Next.js - Zeladoria Inteligente",
+  "scripts": {
+    "dev": "echo 'Adicione Next.js: npm create next-app@latest .'",
+    "build": "echo 'Frontend ainda não configurado'",
+    "start": "echo 'Frontend ainda não configurado'",
+    "lint": "echo 'Frontend ainda não configurado'"
+  }
+}
