@@ -1,11 +1,12 @@
-import serverlessExpress from '@vendia/serverless-express';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import type { Handler } from 'aws-lambda';
-import { AppModule } from '@/app.module';
+import serverlessExpress from '@vendia/serverless-express';
 import { Env } from '@/core/config';
+import { AppModule } from '@/app.module';
+import type { Handler } from 'aws-lambda';
+import type { Express } from 'express';
 
 let serverHandler: Handler;
 
@@ -45,11 +46,11 @@ async function bootstrap(): Promise<Handler> {
 
   await app.init();
 
-  const expressApp = app.getHttpAdapter().getInstance();
+  const expressApp = app.getHttpAdapter().getInstance() as Express;
   return serverlessExpress({ app: expressApp });
 }
 
 export const handler: Handler = async (event, context, callback) => {
   serverHandler ??= await bootstrap();
-  return serverHandler(event, context, callback);
+  return serverHandler(event, context, callback) as Promise<void>;
 };
