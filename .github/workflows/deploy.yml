@@ -33,13 +33,18 @@ jobs:
       - name: Build
         run: npm run build -w @zeladoria-inteligente/api
 
+      - name: Generate production lockfile
+        working-directory: apps/api
+        run: npm install --omit=dev --package-lock-only --ignore-scripts
+
       - name: Create deployment package
         run: |
           mkdir -p /tmp/lambda-pkg
           cp -r apps/api/dist /tmp/lambda-pkg/dist
           cp apps/api/package.json /tmp/lambda-pkg/
+          cp apps/api/package-lock.json /tmp/lambda-pkg/
           cd /tmp/lambda-pkg
-          npm install --omit=dev --ignore-scripts
+          npm ci --omit=dev --ignore-scripts
           zip -r $GITHUB_WORKSPACE/deployment.zip dist/ node_modules/
 
       - name: Configure AWS credentials
