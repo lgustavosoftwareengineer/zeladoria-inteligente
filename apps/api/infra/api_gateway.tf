@@ -2,6 +2,13 @@ resource "aws_apigatewayv2_api" "api" {
   name          = var.app_name
   protocol_type = "HTTP"
 
+  cors_configuration {
+    allow_origins = [var.cors_origin]
+    allow_methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+    allow_headers = ["Content-Type", "Authorization", "Accept"]
+    max_age       = 300
+  }
+
   tags = local.common_tags
 }
 
