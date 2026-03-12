@@ -1,98 +1,375 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# API — Zeladoria Inteligente
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS REST API com integração de LLM para triagem automática de relatos urbanos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Sumário
 
-## Description
+- [Arquitetura](#arquitetura)
+- [Módulos](#módulos)
+- [Banco de dados](#banco-de-dados)
+- [Contrato da API](#contrato-da-api)
+- [Executando localmente](#executando-localmente)
+- [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Testes](#testes)
+- [Infraestrutura](#infraestrutura)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## Arquitetura
 
-```bash
-$ npm install
+A API segue o padrão **Ports & Adapters** com organização por módulos de feature. Código compartilhado reside exclusivamente em `core/` — nenhum módulo de feature importa de outro.
+
+### Diagrama de componentes — módulos NestJS
+
+```mermaid
+graph TB
+    subgraph core["core/ — infraestrutura compartilhada"]
+        Config["config/<br/>Zod env validation"]
+        Domain["domain/<br/>Category · Priority"]
+        Errors["errors/<br/>LlmParseError<br/>LlmValidationError<br/>LlmUnavailableError"]
+        Ports["ports/<br/>ILlmAnalyzer<br/>IAuditLogger"]
+        Filter["filters/<br/>GlobalExceptionFilter"]
+        DB["database/<br/>TypeORM async config"]
+    end
+
+    subgraph reports["reports/ — feature"]
+        RC["ReportsController<br/>POST · GET /reports<br/>GET /reports/:id"]
+        RS["ReportsService"]
+        RRepo["ReportsRepository"]
+        RE["Report entity"]
+    end
+
+    subgraph llm["llm/ — feature (@Global)"]
+        LS["LlmService<br/>implements ILlmAnalyzer"]
+        ORP["OpenRouterProvider<br/>openai SDK + baseURL customizada"]
+        Prompt["triage.prompt.ts<br/>função pura"]
+        Schema["LlmOutputSchema (Zod)"]
+    end
+
+    subgraph audit["audit/ — feature (@Global)"]
+        AS["AuditService<br/>implements IAuditLogger"]
+        ARepo["AuditRepository"]
+        AE["AuditLog entity"]
+    end
+
+    subgraph health["health/"]
+        HC["GET /health"]
+    end
+
+    RC --> RS
+    RS --> RRepo
+    RS -->|"ILlmAnalyzer (token)"| LS
+    RS -->|"IAuditLogger (token)"| AS
+    LS --> ORP
+    LS --> Prompt
+    LS --> Schema
+    AS --> ARepo
+    RRepo --> RE
+    ARepo --> AE
+    RS --> Errors
+    Filter --> Errors
 ```
 
-## Compile and run the project
+### Diagrama de sequência — criação de um relato
 
-```bash
-# development
-$ npm run start
+```mermaid
+sequenceDiagram
+    participant Client as HTTP Client
+    participant Controller as ReportsController
+    participant Service as ReportsService
+    participant Repo as ReportsRepository
+    participant LLM as LlmService
+    participant OR as OpenRouterProvider
+    participant Zod as LlmOutputSchema
+    participant Audit as AuditService
+    participant DB as PostgreSQL
 
-# watch mode
-$ npm run start:dev
+    Client->>Controller: POST /api/reports { title, description, location }
+    Controller->>Controller: Valida CreateReportDto (class-validator)
+    Controller->>Service: create(dto)
 
-# production mode
-$ npm run start:prod
+    Service->>Repo: save(relato com dados padrão)
+    Repo->>DB: INSERT reports
+    DB-->>Repo: Report { id, ... }
+
+    loop Até 3 tentativas
+        Service->>LLM: analyze(dto)
+        LLM->>LLM: buildTriagePrompt(input)
+        LLM->>OR: complete(prompt)
+        OR->>OR: POST openrouter.ai/api/v1/chat/completions
+        OR-->>LLM: raw string
+        LLM->>LLM: extractJson(raw)
+        LLM->>Zod: safeParse(parsed)
+        alt JSON válido
+            Zod-->>LLM: LlmAnalysisResult
+            LLM-->>Service: LlmAnalysisResult
+        else JSON inválido
+            Note over LLM: LlmValidationError → retry
+        end
+    end
+
+    alt Análise bem-sucedida
+        Service->>Repo: save(relato enriquecido)
+        Repo->>DB: UPDATE reports
+        Service->>Audit: createLog(llm_succeeded)
+        Audit->>DB: INSERT audit_logs
+        Service-->>Controller: ReportResponseDto
+        Controller-->>Client: 201 ReportResponseDto
+    else 3 falhas consecutivas
+        Service->>Audit: createLog(llm_failed)
+        Audit->>DB: INSERT audit_logs
+        Service-->>Controller: LlmUnavailableError
+        Controller-->>Client: 503 Service Unavailable
+    end
 ```
 
-## Run tests
+### Mapeamento de erros
 
-```bash
-# unit tests
-$ npm run test
+```mermaid
+sequenceDiagram
+    participant Service
+    participant Filter as GlobalExceptionFilter
+    participant Client
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+    alt LlmUnavailableError
+        Service->>Filter: throw LlmUnavailableError
+        Filter-->>Client: 503
+    else LlmValidationError / LlmParseError
+        Service->>Filter: throw LlmValidationError
+        Filter-->>Client: 422
+    else DTO inválido
+        Service->>Filter: BadRequestException
+        Filter-->>Client: 400
+    else Relato não encontrado
+        Service->>Filter: NotFoundException
+        Filter-->>Client: 404
+    end
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Módulos
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### `core/`
+
+Infraestrutura compartilhada — nenhum módulo de feature importa de outro.
+
+| Pasta | Responsabilidade |
+|---|---|
+| `config/` | Valida `process.env` com Zod na inicialização (fail-fast) |
+| `domain/` | Enums `Category` e `Priority` + arrays `CATEGORIES`/`PRIORITIES` — fonte única da verdade compartilhada com o prompt e o schema Zod |
+| `errors/` | `LlmParseError`, `LlmValidationError`, `LlmUnavailableError` |
+| `ports/` | Interfaces `ILlmAnalyzer` e `IAuditLogger` com tokens de injeção |
+| `filters/` | `GlobalExceptionFilter` — mapeia erros customizados para HTTP |
+| `database/` | Configuração assíncrona do TypeORM |
+
+### `reports/`
+
+Orquestra o fluxo principal: recebe o DTO → salva rascunho → chama LLM → persiste relato enriquecido → registra auditoria.
+
+### `llm/`
+
+Marcado `@Global()`. Implementa `ILlmAnalyzer`:
+- Constrói o prompt com `buildTriagePrompt()` (função pura, testável isoladamente)
+- Chama `OpenRouterProvider` usando o SDK `openai` com `baseURL` customizada
+- Extrai JSON da resposta (suporta markdown fences ` ```json `)
+- Valida saída com `LlmOutputSchema` (Zod)
+- **Retry:** até 3 tentativas com delay entre elas
+- `temperature: 0.1` · `response_format: json_object`
+
+### `audit/`
+
+Marcado `@Global()`. Implementa `IAuditLogger`:
+- Registra cada interação com o LLM em `audit_logs`
+- `report_id` armazenado como UUID simples (sem `@ManyToOne`) para independência de módulo
+
+### `health/`
+
+`GET /health` → `200 OK` — usado pelo AWS Lambda e Docker healthcheck.
+
+---
+
+## Banco de dados
+
+### `reports`
+
+| Coluna | Tipo | Notas |
+|---|---|---|
+| `id` | UUID PK | auto-gerado |
+| `title` | VARCHAR(255) | input do cidadão |
+| `description` | TEXT | input do cidadão |
+| `location` | VARCHAR(500) | input do cidadão |
+| `category` | VARCHAR(100) | saída do LLM |
+| `priority` | VARCHAR(50) | `Baixa \| Média \| Alta` |
+| `technical_summary` | TEXT | resumo técnico gerado pela IA |
+| `created_at` | TIMESTAMPTZ | automático |
+
+### `audit_logs`
+
+| Coluna | Tipo | Notas |
+|---|---|---|
+| `id` | UUID PK | |
+| `report_id` | UUID | FK lógica (sem relação TypeORM) |
+| `event_type` | VARCHAR(50) | `llm_called \| llm_succeeded \| llm_failed` |
+| `provider` | VARCHAR(100) | ex: `openrouter` |
+| `model` | VARCHAR(150) | ex: `google/gemini-2.5-flash` |
+| `prompt_sent` | TEXT | prompt completo enviado |
+| `raw_response` | TEXT | nullable |
+| `error_message` | TEXT | nullable |
+| `latency_ms` | INTEGER | nullable |
+| `created_at` | TIMESTAMPTZ | automático |
+
+---
+
+## Contrato da API
+
+Base URL local: `http://localhost:3001/api`
+Swagger UI: `http://localhost:3001/api/docs`
+
+| Método | Rota | Status | Descrição |
+|---|---|---|---|
+| `POST` | `/reports` | `201` | Cria e enriquece um relato via IA |
+| `GET` | `/reports` | `200` | Lista todos os relatos |
+| `GET` | `/reports/:id` | `200 / 404` | Busca relato por UUID |
+| `GET` | `/health` | `200` | Healthcheck |
+
+**Erros:**
+
+| Código | Causa |
+|---|---|
+| `400` | DTO inválido (campos obrigatórios ausentes ou limites excedidos) |
+| `404` | Relato não encontrado |
+| `422` | Resposta do LLM com formato ou schema inválido |
+| `503` | LLM indisponível após 3 tentativas |
+
+---
+
+## Executando localmente
+
+### Pré-requisitos
+
+- Node.js 22+
+- Docker + Docker Compose
+- Chave da OpenRouter — [como obter](../../README.md#obtendo-uma-chave-da-openrouter)
+
+### Setup rápido
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+cd apps/api
+
+# 1. Configure as variáveis de ambiente
+cp .env.example .env
+# Edite .env (veja seção abaixo)
+
+# 2. Suba o PostgreSQL
+docker-compose up -d postgres
+
+# 3. Inicie a API em modo watch
+npm run start:dev
+# API em http://localhost:3001
+# Swagger em http://localhost:3001/api/docs
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Docker Compose completo (API + banco)
 
-## Resources
+```bash
+cd apps/api
+OPENROUTER_API_KEY=sk-or-v1-... docker-compose up --build
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Variáveis de ambiente
 
-## Support
+| Variável | Obrigatória | Padrão | Descrição |
+|---|---|---|---|
+| `DATABASE_URL` | Sim | — | Connection string PostgreSQL |
+| `OPENROUTER_API_KEY` | Sim | — | Chave da API OpenRouter (`sk-or-v1-...`) |
+| `PORT` | Não | `3001` | Porta HTTP |
+| `OPENROUTER_MODEL` | Não | `google/gemini-2.5-flash` | Modelo LLM |
+| `LLM_PROVIDER_NAME` | Não | `openrouter` | Identificador do provider (auditoria) |
+| `CORS_ORIGIN` | Não | `http://localhost:3000` | Origem permitida pelo CORS |
+| `NODE_ENV` | Não | `development` | Ambiente |
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## Testes
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+cd apps/api
 
-## License
+npm run test        # unit tests
+npm run test:cov    # com cobertura
+npm run lint        # ESLint
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Todos os testes seguem o padrão **AAA (Arrange → Act → Assert)** com comentários explícitos de seção. Não há testes E2E — apenas unitários.
+
+---
+
+## Infraestrutura
+
+Todos os recursos AWS são gerenciados pelo Terraform em `infra/`.
+
+### Recursos provisionados
+
+```mermaid
+graph LR
+    subgraph AWS
+        APIGW["API Gateway HTTP"]
+        Lambda["Lambda Function<br/>nodejs22.x · 512MB · 30s"]
+        SSM1["SSM SecureString<br/>DATABASE_URL"]
+        SSM2["SSM SecureString<br/>OPENROUTER_API_KEY"]
+        IAM["IAM Role<br/>lambda-execution"]
+    end
+
+    subgraph Estado
+        S3["S3 Bucket<br/>tfstate"]
+        DDB["DynamoDB<br/>state lock"]
+    end
+
+    APIGW -->|AWS_PROXY payload 2.0| Lambda
+    Lambda --> SSM1
+    Lambda --> SSM2
+    IAM -->|assume role| Lambda
+```
+
+### Diagrama de sequência — provisionamento e deploy
+
+```mermaid
+sequenceDiagram
+    participant Dev as Desenvolvedor
+    participant TF as Terraform
+    participant AWS
+    participant GH as GitHub Actions
+    participant Lambda as AWS Lambda
+
+    Dev->>TF: terraform apply -var-file="prod.tfvars"
+    TF->>AWS: Cria API Gateway, Lambda (placeholder), SSM, IAM
+    TF-->>Dev: outputs (API URL, Lambda ARN)
+
+    Note over Dev,Lambda: Deploys subsequentes via CI/CD
+
+    Dev->>GH: git push origin main
+    GH->>GH: npm run build
+    GH->>Lambda: aws lambda update-function-code
+    Lambda-->>GH: deploy concluído
+```
+
+### Comandos
+
+```bash
+cd apps/api/infra
+
+terraform init
+terraform plan  -var-file="prod.tfvars"
+terraform apply -var-file="prod.tfvars"
+```
+
+Exemplo de `prod.tfvars` (não commitado — está no `.gitignore`):
+
+```hcl
+database_url       = "postgresql://..."
+openrouter_api_key = "sk-or-v1-..."
+cors_origin        = "https://seu-app.vercel.app"
+```
