@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button"
 import { PriorityBadge } from "./components"
-import type { ReportResponse } from "../../types/report.types"
+import type { ReportResponse } from "../../../../types/report.types"
 
 type ReportFormSuccessProps = {
   report: ReportResponse

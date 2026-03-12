@@ -1,9 +1,9 @@
 "use client"
 
 import { useReportForm } from "../../hooks/use-report-form"
-import { ReportFormFields } from "../ReportFormFields"
-import { ReportFormLoading } from "../ReportFormLoading"
-import { ReportFormSuccess } from "../ReportFormSuccess"
+import { ReportFormFields } from "./components/ReportFormFields"
+import { ReportFormLoading } from "./components/ReportFormLoading"
+import { ReportFormSuccess } from "./components/ReportFormSuccess"
 
 export function ReportForm() {
   const {
@@ -15,6 +15,8 @@ export function ReportForm() {
     handleNewReport,
     errors,
     dirtyFields,
+    locationMode,
+    toggleLocationMode,
   } = useReportForm()
   const { isPending: isLoading, isSuccess, data: reportData } = reportMutation
 
@@ -42,6 +44,8 @@ export function ReportForm() {
       cepMutation={cepMutation}
       reportMutation={reportMutation}
       handleCepBlur={handleCepBlur}
+      locationMode={locationMode}
+      onToggleLocationMode={toggleLocationMode}
     />
   )
 }

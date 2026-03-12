@@ -1,11 +1,14 @@
 import { z } from "zod"
 import type { Resolver } from "react-hook-form"
 
+export type LocationMode = "simple" | "detailed"
+
 export const reportSchema = z.object({
   title: z.string().min(3, "O título deve ter pelo menos 3 caracteres."),
   description: z
     .string()
     .min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  locationText: z.string().optional(),
   cep: z
     .string()
     .min(1, "O CEP é obrigatório.")
@@ -18,25 +21,45 @@ export const reportSchema = z.object({
   state: z.string().min(1, "O estado é obrigatório."),
 })
 
+const simpleLocationSchema = z.object({
+  title: z.string().min(3, "O título deve ter pelo menos 3 caracteres."),
+  description: z
+    .string()
+    .min(10, "A descrição deve ter pelo menos 10 caracteres."),
+  locationText: z
+    .string()
+    .min(3, "A localização deve ter pelo menos 3 caracteres."),
+})
+
 export type ReportFormValues = z.infer<typeof reportSchema>
 
-export const reportResolver: Resolver<ReportFormValues> = (values) => {
-  const {
-    success: isSuccess,
-    data,
-    error: errorData,
-  } = reportSchema.safeParse(values)
+function buildResolver(schema: z.ZodTypeAny): Resolver<ReportFormValues> {
+  return (values) => {
+    const {
+      success: isSuccess,
+      data,
+      error: errorData,
+    } = schema.safeParse(values)
 
-  if (isSuccess) {
-    return Promise.resolve({ values: data, errors: {} })
+    if (isSuccess) {
+      return Promise.resolve({ values: data as ReportFormValues, errors: {} })
+    }
+
+    const errors = Object.fromEntries(
+      errorData.issues.map(({ code, message, path }) => [
+        path.join("."),
+        { message, type: code },
+      ]),
+    )
+
+    return Promise.resolve({ values: {}, errors })
   }
-
-  const errors = Object.fromEntries(
-    errorData.issues.map(({ code, message, path }) => [
-      path.join("."),
-      { message: message, type: code },
-    ]),
-  )
-
-  return Promise.resolve({ values: {}, errors })
 }
+
+export function buildReportResolver(
+  mode: LocationMode,
+): Resolver<ReportFormValues> {
+  return buildResolver(mode === "simple" ? simpleLocationSchema : reportSchema)
+}
+
+export const reportResolver = buildReportResolver("detailed")

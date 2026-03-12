@@ -1,22 +1,36 @@
 "use client"
 
 import { useMutation } from "@tanstack/react-query"
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { useForm } from "react-hook-form"
 import { fetchAddressByCep } from "@/services/viacep"
 import { DEFAULT_VALUES } from "../constants/report-form.constants"
 import { createReport } from "../requests/create-report"
-import { reportResolver, type ReportFormValues } from "../schemas/report.schema"
+import {
+  buildReportResolver,
+  type LocationMode,
+  type ReportFormValues,
+} from "../schemas/report.schema"
 import { formatLocation } from "../utils/address"
 
 export function useReportForm() {
+  const [locationMode, setLocationMode] = useState<LocationMode>("simple")
+
   const form = useForm<ReportFormValues>({
-    resolver: reportResolver,
+    resolver: buildReportResolver(locationMode),
     defaultValues: DEFAULT_VALUES,
   })
 
   const { setValue, setError, clearErrors, reset } = form
   const { errors, dirtyFields } = form.formState
+
+  const toggleLocationMode = useCallback(() => {
+    setLocationMode((prev) => {
+      const next = prev === "simple" ? "detailed" : "simple"
+      clearErrors()
+      return next
+    })
+  }, [clearErrors])
 
   const cepMutation = useMutation({
     mutationFn: fetchAddressByCep,
@@ -56,17 +70,23 @@ export function useReportForm() {
     reportMutation.reset()
     cepMutation.reset()
     reset()
+    setLocationMode("detailed")
   }, [cepMutation, reportMutation, reset])
 
   const onSubmit = useCallback(
     (values: ReportFormValues) => {
+      const location =
+        locationMode === "simple"
+          ? (values.locationText ?? "")
+          : formatLocation(values)
+
       reportMutation.mutate({
         title: values.title,
         description: values.description,
-        location: formatLocation(values),
+        location,
       })
     },
-    [reportMutation],
+    [reportMutation, locationMode],
   )
 
   return {
@@ -78,5 +98,7 @@ export function useReportForm() {
     handleNewReport,
     errors,
     dirtyFields,
+    locationMode,
+    toggleLocationMode,
   }
 }
