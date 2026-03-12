@@ -27,7 +27,9 @@ async function bootstrap(): Promise<Handler> {
 
   app.setGlobalPrefix('api');
 
-  setupSwagger(app);
+  if (config.get('NODE_ENV') === 'development') {
+    setupSwagger(app);
+  }
 
   await app.init();
 

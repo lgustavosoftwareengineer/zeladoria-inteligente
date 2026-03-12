@@ -22,12 +22,16 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  setupSwagger(app);
+  const isDevelopment = config.get('NODE_ENV') === 'development';
+
+  if (isDevelopment) {
+    setupSwagger(app);
+  }
 
   const port = config.get('PORT', { infer: true }) ?? DEFAULT_PORT;
   await app.listen(port);
 
-  if (config.get('NODE_ENV') === 'development') {
+  if (isDevelopment) {
     console.log(
       `zeladoria-inteligente-api running on http://localhost:${port}/api`,
     );
