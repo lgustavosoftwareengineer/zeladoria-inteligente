@@ -131,7 +131,9 @@ docker-compose up -d postgres
 
 # 2. Configure as variáveis de ambiente
 cp .env.example .env
-# Edite .env e preencha DATABASE_URL e OPENROUTER_API_KEY
+# Edite .env:
+# DATABASE_URL=postgresql://postgres:postgres@localhost:5432/zeladoria
+# OPENROUTER_API_KEY=sk-or-v1-...
 
 # 3. Inicie a API em modo watch
 cd ../..

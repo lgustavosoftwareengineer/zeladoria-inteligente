@@ -283,7 +283,7 @@ OPENROUTER_API_KEY=sk-or-v1-... docker-compose up --build
 
 | Variável | Obrigatória | Padrão | Descrição |
 |---|---|---|---|
-| `DATABASE_URL` | Sim | — | Connection string PostgreSQL |
+| `DATABASE_URL` | Sim | — | Connection string PostgreSQL (ex: `postgresql://postgres:postgres@localhost:5432/zeladoria`) |
 | `OPENROUTER_API_KEY` | Sim | — | Chave da API OpenRouter (`sk-or-v1-...`) |
 | `PORT` | Não | `3001` | Porta HTTP |
 | `OPENROUTER_MODEL` | Não | `google/gemini-2.5-flash` | Modelo LLM |
