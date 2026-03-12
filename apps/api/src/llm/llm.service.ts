@@ -76,10 +76,14 @@ export class LlmService implements ILlmAnalyzer {
 
   private extractJson(raw: string): string {
     const fenceMatch = /```(?:json)?\s*([\s\S]*?)```/.exec(raw);
-    if (fenceMatch?.[1]) return fenceMatch[1].trim();
+    if (fenceMatch?.[1]) {
+      return fenceMatch[1].trim();
+    }
 
     const objectMatch = /\{[\s\S]*\}/.exec(raw);
-    if (objectMatch?.[0]) return objectMatch[0].trim();
+    if (objectMatch?.[0]) {
+      return objectMatch[0].trim();
+    }
 
     return raw.trim();
   }
