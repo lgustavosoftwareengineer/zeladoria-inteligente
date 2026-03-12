@@ -223,8 +223,12 @@ Marcado `@Global()`. Implementa `IAuditLogger`:
 
 ## Contrato da API
 
-Base URL local: `http://localhost:3001/api`
-Swagger UI: `http://localhost:3001/api/docs`
+| Ambiente | Base URL |
+|---|---|
+| Local | `http://localhost:3001/api` |
+| Produção | `https://ydrbaon8dh.execute-api.us-east-1.amazonaws.com/api` |
+
+Swagger UI (apenas em desenvolvimento): `http://localhost:3001/api/docs`
 
 | Método | Rota | Status | Descrição |
 |---|---|---|---|

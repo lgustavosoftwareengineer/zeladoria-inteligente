@@ -2,6 +2,12 @@
 
 Sistema de triagem inteligente de relatos urbanos. Cidadãos descrevem um problema urbano (título, descrição, localização) e a IA classifica automaticamente a categoria, prioridade e gera um resumo técnico para administradores públicos.
 
+| | Link |
+|---|---|
+| **Frontend** | https://zeladoria-inteligente-3zishia4r-tonicprisms-projects.vercel.app |
+| **API** | https://ydrbaon8dh.execute-api.us-east-1.amazonaws.com |
+| **Swagger UI** | indisponível em produção |
+
 ## Estrutura do monorepo
 
 ```
