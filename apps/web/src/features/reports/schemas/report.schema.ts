@@ -14,7 +14,7 @@ export const reportSchema = z.object({
     .min(1, "O CEP é obrigatório.")
     .regex(/^\d{5}-?\d{3}$/, "CEP inválido."),
   street: z.string().min(1, "A rua é obrigatória."),
-  number: z.string().min(1, "O número é obrigatório."),
+  number: z.string().optional(),
   complement: z.string().optional(),
   neighborhood: z.string().min(1, "O bairro é obrigatório."),
   city: z.string().min(1, "A cidade é obrigatória."),

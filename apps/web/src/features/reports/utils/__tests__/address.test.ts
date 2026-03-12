@@ -48,4 +48,15 @@ describe("formatLocation", () => {
     // Assert
     expect(result).toBe("Praça da Sé, 1, Sé, São Paulo - SP, CEP 01001-000")
   })
+
+  it("should format without number when number is empty or undefined", () => {
+    // Arrange
+    const values: ReportFormValues = { ...BASE_VALUES, number: "" }
+
+    // Act
+    const result = formatLocation(values)
+
+    // Assert
+    expect(result).toBe("Praça da Sé, Sé, São Paulo - SP, CEP 01001-000")
+  })
 })

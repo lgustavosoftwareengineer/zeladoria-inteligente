@@ -68,14 +68,13 @@ export function LocationDetailedFields({
         <Field
           id="number"
           label="Número"
-          required
           error={errors.number?.message}
           className="col-span-1"
         >
           <Input
             id="number"
             type="text"
-            placeholder="Ex: 123"
+            placeholder="Ex: 123 (opcional)"
             aria-invalid={!!errors.number}
             aria-describedby={errors.number ? "number-error" : undefined}
             {...register("number")}

@@ -108,6 +108,20 @@ describe("reportSchema", () => {
     // Assert
     expect(result.success).toBe(true)
   })
+
+  it("should allow number to be optional (street and neighborhood only)", () => {
+    // Arrange
+    const values = {
+      ...VALID_DETAILED_VALUES,
+      number: "",
+    }
+
+    // Act
+    const result = reportSchema.safeParse(values)
+
+    // Assert
+    expect(result.success).toBe(true)
+  })
 })
 
 describe("reportResolver (detailed mode)", () => {
