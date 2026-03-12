@@ -10,7 +10,7 @@ export default function Home() {
           </h1>
           <p className="mt-2 text-sm text-gray-500">
             Mande aqui o problema urbano que está acontecendo pertinho de você e
-            vamos lhe ajudar a classificá-lo melhor! 😀
+            vamos lhe ajudar a classificá-lo melhor!
           </p>
         </div>
 
