@@ -5,7 +5,7 @@
     "apps/*"
   ],
   "scripts": {
-    "prepare": "husky",
+    "prepare": "node --eval \"process.env.CI || process.exit(1)\" || husky",
     "build": "npm run build -w @zeladoria-inteligente/api",
     "test": "npm run test:api && npm run test:web",
     "test:api": "npm run test -w @zeladoria-inteligente/api",
