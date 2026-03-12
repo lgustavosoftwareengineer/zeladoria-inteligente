@@ -7,7 +7,9 @@
   "scripts": {
     "prepare": "husky",
     "build": "npm run build -w @zeladoria-inteligente/api",
-    "test": "npm run test -w @zeladoria-inteligente/api",
+    "test": "npm run test:api && npm run test:web",
+    "test:api": "npm run test -w @zeladoria-inteligente/api",
+    "test:web": "npm run test -w @zeladoria-inteligente/web",
     "dev:api": "npm run start:dev -w @zeladoria-inteligente/api",
     "dev:web": "npm run dev -w @zeladoria-inteligente/web"
   },

@@ -296,11 +296,14 @@ OPENROUTER_API_KEY=sk-or-v1-... docker-compose up --build
 ## Testes
 
 ```bash
+# Dentro do app
 cd apps/api
-
 npm run test        # unit tests
 npm run test:cov    # com cobertura
 npm run lint        # ESLint
+
+# Ou na raiz do monorepo
+npm run test:api   # roda os testes da API
 ```
 
 Todos os testes seguem o padrão **AAA (Arrange → Act → Assert)** com comentários explícitos de seção. Não há testes E2E — apenas unitários.

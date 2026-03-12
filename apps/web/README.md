@@ -296,10 +296,13 @@ Em produção (Vercel), configure `NEXT_PUBLIC_API_URL` com a URL do API Gateway
 ## Testes
 
 ```bash
+# Dentro do app
 cd apps/web
-
 npm run test        # unit tests (Jest + React Testing Library)
 npm run test:cov    # com cobertura
+
+# Ou na raiz do monorepo
+npm run test:web    # roda os testes do frontend
 ```
 
 Os testes cobrem componentes individuais, o hook `useReportForm`, schemas Zod, requests e utilitários. Padrão **AAA (Arrange → Act → Assert)** em todos os arquivos.

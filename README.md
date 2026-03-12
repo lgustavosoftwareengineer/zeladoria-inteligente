@@ -158,16 +158,15 @@ npm run dev
 
 ## Testes
 
+Na raiz do monorepo:
+
 ```bash
-# Testes da API
-npm run test
-
-# Testes do frontend
-npm run test -w @zeladoria-inteligente/web
-
-# Ambos (equivalente ao pre-commit hook)
-npm run test && npm run test -w @zeladoria-inteligente/web
+npm run test        # API + frontend (ambos)
+npm run test:api    # só API
+npm run test:web    # só frontend
 ```
+
+O pre-commit (Husky) executa `test:api` e `test:web` antes de cada commit.
 
 ---
 
