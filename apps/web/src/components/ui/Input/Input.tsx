@@ -1,7 +1,7 @@
 "use client"
 
-import { cn } from "@/shared/cn"
 import type { ComponentPropsWithoutRef } from "react"
+import { cn } from "@/shared/cn"
 
 export type InputProps = ComponentPropsWithoutRef<"input">
 

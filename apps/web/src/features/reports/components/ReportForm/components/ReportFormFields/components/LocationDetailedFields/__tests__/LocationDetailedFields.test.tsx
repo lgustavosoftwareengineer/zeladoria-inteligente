@@ -1,9 +1,9 @@
-import { render, screen, fireEvent } from "@testing-library/react"
-import { LocationDetailedFields } from "../LocationDetailedFields"
-import type { ReportFormValues } from "../../../../../../schemas/report.schema"
-import type { ViaCepAddress } from "@/services/viacep"
 import type { UseMutationResult } from "@tanstack/react-query"
+import { render, screen, fireEvent } from "@testing-library/react"
 import type { FieldErrors, UseFormRegister } from "react-hook-form"
+import type { ViaCepAddress } from "@/services/viacep"
+import type { ReportFormValues } from "../../../../../../schemas/report.schema"
+import { LocationDetailedFields } from "../LocationDetailedFields"
 
 function buildMockRegister(): UseFormRegister<ReportFormValues> {
   return jest

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react"
-import { ReportFormSuccess } from "../ReportFormSuccess"
 import type { ReportResponse } from "../../../../../types/report.types"
+import { ReportFormSuccess } from "../ReportFormSuccess"
 
 const MOCK_REPORT: ReportResponse = {
   id: "abc-123",

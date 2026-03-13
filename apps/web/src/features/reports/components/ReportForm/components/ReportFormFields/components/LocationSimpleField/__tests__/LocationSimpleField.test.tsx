@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react"
-import { LocationSimpleField } from "../LocationSimpleField"
-import type { ReportFormValues } from "../../../../../../schemas/report.schema"
 import type { UseFormRegister } from "react-hook-form"
+import type { ReportFormValues } from "../../../../../../schemas/report.schema"
+import { LocationSimpleField } from "../LocationSimpleField"
 
 function buildMockRegister(): UseFormRegister<ReportFormValues> {
   return jest.fn().mockReturnValue({

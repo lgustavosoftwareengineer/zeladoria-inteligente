@@ -1,8 +1,8 @@
 "use client"
 
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/shared/cn"
 import type { ComponentPropsWithoutRef } from "react"
+import { cn } from "@/shared/cn"
 
 const badgeVariants = cva("rounded-full px-3 py-1 text-sm font-medium", {
   variants: {

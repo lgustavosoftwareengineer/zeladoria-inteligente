@@ -1,8 +1,8 @@
 "use client"
 
+import type { UseFormRegister } from "react-hook-form"
 import { Textarea } from "@/components/ui/Textarea"
 import type { ReportFormValues } from "../../../../../../schemas/report.schema"
-import type { UseFormRegister } from "react-hook-form"
 
 export type LocationSimpleFieldProps = {
   register: UseFormRegister<ReportFormValues>

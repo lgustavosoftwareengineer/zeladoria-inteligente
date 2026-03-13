@@ -1,19 +1,19 @@
+import type { UseMutationResult } from "@tanstack/react-query"
 import { render, screen } from "@testing-library/react"
 import { fireEvent } from "@testing-library/react"
-import { ReportFormFields } from "../ReportFormFields"
-import type { ReportFormValues } from "../../../../../schemas/report.schema"
-import type {
-  CreateReportDto,
-  ReportResponse,
-} from "../../../../../types/report.types"
-import type { ViaCepAddress } from "@/services/viacep"
-import type { UseMutationResult } from "@tanstack/react-query"
 import type {
   FieldErrors,
   UseFormHandleSubmit,
   UseFormRegister,
   UseFormSetValue,
 } from "react-hook-form"
+import type { ViaCepAddress } from "@/services/viacep"
+import type { ReportFormValues } from "../../../../../schemas/report.schema"
+import type {
+  CreateReportDto,
+  ReportResponse,
+} from "../../../../../types/report.types"
+import { ReportFormFields } from "../ReportFormFields"
 
 function buildMockRegister(): UseFormRegister<ReportFormValues> {
   return jest.fn().mockReturnValue({

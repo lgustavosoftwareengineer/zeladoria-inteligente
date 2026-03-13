@@ -29,7 +29,6 @@ const eslintConfig = [
             "parent",
             "sibling",
             "index",
-            "type",
           ],
           pathGroups: [
             { pattern: "@/components/**", group: "internal", position: "before" },

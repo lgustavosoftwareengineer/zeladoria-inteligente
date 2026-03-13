@@ -1,5 +1,5 @@
-import { formatLocation } from "../address"
 import type { ReportFormValues } from "../../schemas/report.schema"
+import { formatLocation } from "../address"
 
 const BASE_VALUES: ReportFormValues = {
   title: "Buraco na rua",

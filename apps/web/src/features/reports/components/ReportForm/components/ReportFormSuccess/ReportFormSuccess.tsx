@@ -1,8 +1,8 @@
 "use client"
 
 import { Button } from "@/components/ui/Button"
-import { PriorityBadge } from "./components"
 import type { ReportResponse } from "../../../../types/report.types"
+import { PriorityBadge } from "./components"
 
 type ReportFormSuccessProps = {
   report: ReportResponse

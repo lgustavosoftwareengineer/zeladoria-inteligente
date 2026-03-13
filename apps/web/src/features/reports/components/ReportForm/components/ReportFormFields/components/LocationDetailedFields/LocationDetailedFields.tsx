@@ -1,11 +1,11 @@
 "use client"
 
+import type { UseMutationResult } from "@tanstack/react-query"
+import type { FieldErrors, UseFormRegister } from "react-hook-form"
 import { Field } from "@/components/ui/Field"
 import { Input } from "@/components/ui/Input"
 import { fetchAddressByCep } from "@/services/viacep"
 import type { ReportFormValues } from "../../../../../../schemas/report.schema"
-import type { UseMutationResult } from "@tanstack/react-query"
-import type { FieldErrors, UseFormRegister } from "react-hook-form"
 
 export type LocationDetailedFieldsProps = {
   register: UseFormRegister<ReportFormValues>

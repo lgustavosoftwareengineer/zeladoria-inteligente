@@ -1,5 +1,5 @@
-import { createReport } from "../create-report"
 import type { CreateReportDto, ReportResponse } from "../../types/report.types"
+import { createReport } from "../create-report"
 
 const MOCK_DTO: CreateReportDto = {
   title: "Buraco na rua",
