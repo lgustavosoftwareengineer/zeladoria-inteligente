@@ -1,6 +1,5 @@
 "use client"
 
-import { useCallback } from "react"
 import { Button } from "@/components/ui/Button"
 import { Field } from "@/components/ui/Field"
 import { Input } from "@/components/ui/Input"
@@ -57,22 +56,19 @@ export function ReportFormFields({
 }: ReportFormFieldsProps) {
   const { isError: hasError, error: errorData } = reportMutation
 
-  const handleOnChangeCEP = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const raw = event.target.value.replace(/\D/g, "")
-      event.target.value =
-        raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5, 8)}` : raw
+  const handleOnChangeCEP = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = event.target.value.replace(/\D/g, "")
+    event.target.value =
+      raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5, 8)}` : raw
 
-      if (raw.length === 0) {
-        cepMutation.reset()
-        setValue("street", "")
-        setValue("neighborhood", "")
-        setValue("city", "")
-        setValue("state", "")
-      }
-    },
-    [cepMutation, setValue],
-  )
+    if (raw.length === 0) {
+      cepMutation.reset()
+      setValue("street", "")
+      setValue("neighborhood", "")
+      setValue("city", "")
+      setValue("state", "")
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

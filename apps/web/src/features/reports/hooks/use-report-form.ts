@@ -1,7 +1,7 @@
 "use client"
 
 import { useMutation } from "@tanstack/react-query"
-import { useCallback, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { fetchAddressByCep } from "@/services/viacep"
 import { DEFAULT_VALUES } from "../constants/report-form.constants"
@@ -24,13 +24,13 @@ export function useReportForm() {
   const { setValue, setError, clearErrors, reset } = form
   const { errors, dirtyFields } = form.formState
 
-  const toggleLocationMode = useCallback(() => {
+  const toggleLocationMode = () => {
     setLocationMode((prev) => {
       const next = prev === "simple" ? "detailed" : "simple"
       clearErrors()
       return next
     })
-  }, [clearErrors])
+  }
 
   const cepMutation = useMutation({
     mutationFn: fetchAddressByCep,
@@ -56,38 +56,32 @@ export function useReportForm() {
     mutationFn: createReport,
   })
 
-  const handleCepBlur = useCallback(
-    (event: React.FocusEvent<HTMLInputElement>) => {
-      const cep = event.target.value.replace(/\D/g, "")
-      if (cep.length === 8) {
-        cepMutation.mutate(cep)
-      }
-    },
-    [cepMutation],
-  )
+  const handleCepBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const cep = event.target.value.replace(/\D/g, "")
+    if (cep.length === 8) {
+      cepMutation.mutate(cep)
+    }
+  }
 
-  const handleNewReport = useCallback(() => {
+  const handleNewReport = () => {
     reportMutation.reset()
     cepMutation.reset()
     reset()
     setLocationMode("detailed")
-  }, [cepMutation, reportMutation, reset])
+  }
 
-  const onSubmit = useCallback(
-    (values: ReportFormValues) => {
-      const location =
-        locationMode === "simple"
-          ? (values.locationText ?? "")
-          : formatLocation(values)
+  const onSubmit = (values: ReportFormValues) => {
+    const location =
+      locationMode === "simple"
+        ? (values.locationText ?? "")
+        : formatLocation(values)
 
-      reportMutation.mutate({
-        title: values.title,
-        description: values.description,
-        location,
-      })
-    },
-    [reportMutation, locationMode],
-  )
+    reportMutation.mutate({
+      title: values.title,
+      description: values.description,
+      location,
+    })
+  }
 
   return {
     form,
