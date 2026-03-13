@@ -16,9 +16,7 @@ export function buildMockAuditRepository(): {
 export function buildMockConfigService() {
   return {
     get: jest.fn((key: string) =>
-      key === 'LLM_PROVIDER_NAME'
-        ? 'openrouter'
-        : 'meta-llama/llama-3.3-70b-instruct:free',
+      key === 'LLM_PROVIDER_NAME' ? 'openrouter' : 'google/gemini-2.5-flash',
     ),
   };
 }

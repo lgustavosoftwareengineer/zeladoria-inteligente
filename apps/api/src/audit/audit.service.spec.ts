@@ -38,7 +38,7 @@ describe('AuditService', () => {
           reportId: 'report-uuid-1',
           eventType: AuditEvent.LLM_SUCCEEDED,
           provider: 'openrouter',
-          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          model: 'google/gemini-2.5-flash',
           latencyMs: 300,
         }),
       );

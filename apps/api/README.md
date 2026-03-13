@@ -154,14 +154,14 @@ sequenceDiagram
 
 Infraestrutura compartilhada — nenhum módulo de feature importa de outro.
 
-| Pasta | Responsabilidade |
-|---|---|
-| `config/` | Valida `process.env` com Zod na inicialização (fail-fast) |
-| `domain/` | Enums `Category` e `Priority` + arrays `CATEGORIES`/`PRIORITIES` — fonte única da verdade compartilhada com o prompt e o schema Zod |
-| `errors/` | `LlmParseError`, `LlmValidationError`, `LlmUnavailableError` |
-| `ports/` | Interfaces `ILlmAnalyzer` e `IAuditLogger` com tokens de injeção |
-| `filters/` | `GlobalExceptionFilter` — mapeia erros customizados para HTTP |
-| `database/` | Configuração assíncrona do TypeORM |
+| Pasta       | Responsabilidade                                                                                                                    |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `config/`   | Valida `process.env` com Zod na inicialização (fail-fast)                                                                           |
+| `domain/`   | Enums `Category` e `Priority` + arrays `CATEGORIES`/`PRIORITIES` — fonte única da verdade compartilhada com o prompt e o schema Zod |
+| `errors/`   | `LlmParseError`, `LlmValidationError`, `LlmUnavailableError`                                                                        |
+| `ports/`    | Interfaces `ILlmAnalyzer` e `IAuditLogger` com tokens de injeção                                                                    |
+| `filters/`  | `GlobalExceptionFilter` — mapeia erros customizados para HTTP                                                                       |
+| `database/` | Configuração assíncrona do TypeORM                                                                                                  |
 
 ### `reports/`
 
@@ -170,6 +170,7 @@ Orquestra o fluxo principal: recebe o DTO → salva rascunho → chama LLM → p
 ### `llm/`
 
 Marcado `@Global()`. Implementa `ILlmAnalyzer`:
+
 - Constrói o prompt com `buildTriagePrompt()` (função pura, testável isoladamente)
 - Chama `OpenRouterProvider` usando o SDK `openai` com `baseURL` customizada
 - Extrai JSON da resposta (suporta markdown fences ` ```json `)
@@ -180,6 +181,7 @@ Marcado `@Global()`. Implementa `ILlmAnalyzer`:
 ### `audit/`
 
 Marcado `@Global()`. Implementa `IAuditLogger`:
+
 - Registra cada interação com o LLM em `audit_logs`
 - `report_id` armazenado como UUID simples (sem `@ManyToOne`) para independência de módulo
 
@@ -193,58 +195,58 @@ Marcado `@Global()`. Implementa `IAuditLogger`:
 
 ### `reports`
 
-| Coluna | Tipo | Notas |
-|---|---|---|
-| `id` | UUID PK | auto-gerado |
-| `title` | VARCHAR(255) | input do cidadão |
-| `description` | TEXT | input do cidadão |
-| `location` | VARCHAR(500) | input do cidadão |
-| `category` | VARCHAR(100) | saída do LLM |
-| `priority` | VARCHAR(50) | `Baixa \| Média \| Alta` |
-| `technical_summary` | TEXT | resumo técnico gerado pela IA |
-| `created_at` | TIMESTAMPTZ | automático |
+| Coluna              | Tipo         | Notas                         |
+| ------------------- | ------------ | ----------------------------- |
+| `id`                | UUID PK      | auto-gerado                   |
+| `title`             | VARCHAR(255) | input do cidadão              |
+| `description`       | TEXT         | input do cidadão              |
+| `location`          | VARCHAR(500) | input do cidadão              |
+| `category`          | VARCHAR(100) | saída do LLM                  |
+| `priority`          | VARCHAR(50)  | `Baixa \| Média \| Alta`      |
+| `technical_summary` | TEXT         | resumo técnico gerado pela IA |
+| `created_at`        | TIMESTAMPTZ  | automático                    |
 
 ### `audit_logs`
 
-| Coluna | Tipo | Notas |
-|---|---|---|
-| `id` | UUID PK | |
-| `report_id` | UUID | FK lógica (sem relação TypeORM) |
-| `event_type` | VARCHAR(50) | `llm_called \| llm_succeeded \| llm_failed` |
-| `provider` | VARCHAR(100) | ex: `openrouter` |
-| `model` | VARCHAR(150) | ex: `meta-llama/llama-3.3-70b-instruct:free` |
-| `prompt_sent` | TEXT | prompt completo enviado |
-| `raw_response` | TEXT | nullable |
-| `error_message` | TEXT | nullable |
-| `latency_ms` | INTEGER | nullable |
-| `created_at` | TIMESTAMPTZ | automático |
+| Coluna          | Tipo         | Notas                                       |
+| --------------- | ------------ | ------------------------------------------- |
+| `id`            | UUID PK      |                                             |
+| `report_id`     | UUID         | FK lógica (sem relação TypeORM)             |
+| `event_type`    | VARCHAR(50)  | `llm_called \| llm_succeeded \| llm_failed` |
+| `provider`      | VARCHAR(100) | ex: `openrouter`                            |
+| `model`         | VARCHAR(150) | ex: `google/gemini-2.5-flash`               |
+| `prompt_sent`   | TEXT         | prompt completo enviado                     |
+| `raw_response`  | TEXT         | nullable                                    |
+| `error_message` | TEXT         | nullable                                    |
+| `latency_ms`    | INTEGER      | nullable                                    |
+| `created_at`    | TIMESTAMPTZ  | automático                                  |
 
 ---
 
 ## Contrato da API
 
-| Ambiente | Base URL |
-|---|---|
-| Local | `http://localhost:3001/api` |
+| Ambiente | Base URL                                                     |
+| -------- | ------------------------------------------------------------ |
+| Local    | `http://localhost:3001/api`                                  |
 | Produção | `https://ydrbaon8dh.execute-api.us-east-1.amazonaws.com/api` |
 
 Swagger UI (apenas em desenvolvimento): `http://localhost:3001/api/docs`
 
-| Método | Rota | Status | Descrição |
-|---|---|---|---|
-| `POST` | `/reports` | `201` | Cria e enriquece um relato via IA |
-| `GET` | `/reports` | `200` | Lista todos os relatos |
-| `GET` | `/reports/:id` | `200 / 404` | Busca relato por UUID |
-| `GET` | `/health` | `200` | Healthcheck |
+| Método | Rota           | Status      | Descrição                         |
+| ------ | -------------- | ----------- | --------------------------------- |
+| `POST` | `/reports`     | `201`       | Cria e enriquece um relato via IA |
+| `GET`  | `/reports`     | `200`       | Lista todos os relatos            |
+| `GET`  | `/reports/:id` | `200 / 404` | Busca relato por UUID             |
+| `GET`  | `/health`      | `200`       | Healthcheck                       |
 
 **Erros:**
 
-| Código | Causa |
-|---|---|
-| `400` | DTO inválido (campos obrigatórios ausentes ou limites excedidos) |
-| `404` | Relato não encontrado |
-| `422` | Resposta do LLM com formato ou schema inválido |
-| `503` | LLM indisponível após 3 tentativas |
+| Código | Causa                                                            |
+| ------ | ---------------------------------------------------------------- |
+| `400`  | DTO inválido (campos obrigatórios ausentes ou limites excedidos) |
+| `404`  | Relato não encontrado                                            |
+| `422`  | Resposta do LLM com formato ou schema inválido                   |
+| `503`  | LLM indisponível após 3 tentativas                               |
 
 ---
 
@@ -285,15 +287,15 @@ OPENROUTER_API_KEY=sk-or-v1-... docker-compose up --build
 
 ## Variáveis de ambiente
 
-| Variável | Obrigatória | Padrão | Descrição |
-|---|---|---|---|
-| `DATABASE_URL` | Sim | — | Connection string PostgreSQL (ex: `postgresql://user:password@host:5432/dbname`) |
-| `OPENROUTER_API_KEY` | Sim | — | Chave da API OpenRouter (`sk-or-v1-...`) |
-| `PORT` | Não | `3001` | Porta HTTP |
-| `OPENROUTER_MODEL` | Não | `meta-llama/llama-3.3-70b-instruct:free` | Modelo LLM |
-| `LLM_PROVIDER_NAME` | Não | `openrouter` | Identificador do provider (auditoria) |
-| `CORS_ORIGIN` | Não | `http://localhost:3000` | Origem permitida pelo CORS |
-| `NODE_ENV` | Não | `development` | Ambiente |
+| Variável             | Obrigatória | Padrão                    | Descrição                                                                        |
+| -------------------- | ----------- | ------------------------- | -------------------------------------------------------------------------------- |
+| `DATABASE_URL`       | Sim         | —                         | Connection string PostgreSQL (ex: `postgresql://user:password@host:5432/dbname`) |
+| `OPENROUTER_API_KEY` | Sim         | —                         | Chave da API OpenRouter (`sk-or-v1-...`)                                         |
+| `PORT`               | Não         | `3001`                    | Porta HTTP                                                                       |
+| `OPENROUTER_MODEL`   | Não         | `google/gemini-2.5-flash` | Modelo LLM                                                                       |
+| `LLM_PROVIDER_NAME`  | Não         | `openrouter`              | Identificador do provider (auditoria)                                            |
+| `CORS_ORIGIN`        | Não         | `http://localhost:3000`   | Origem permitida pelo CORS                                                       |
+| `NODE_ENV`           | Não         | `development`             | Ambiente                                                                         |
 
 ---
 
