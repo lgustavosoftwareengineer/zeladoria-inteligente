@@ -5,12 +5,12 @@ import {
   LlmValidationError,
 } from '@/core/errors';
 import {
-  GlobalExceptionFilter,
   MESSAGE_INTERNAL_ERROR,
   MESSAGE_LLM_PARSE_ERROR,
   MESSAGE_LLM_UNAVAILABLE,
   MESSAGE_LLM_VALIDATION_FAILED,
-} from '@/core/filters/global-exception.filter';
+} from '@/core/filters/global-exception.constants';
+import { GlobalExceptionFilter } from '@/core/filters/global-exception.filter';
 import { buildMockArgumentsHost } from '@/core/filters/mocks';
 
 describe('GlobalExceptionFilter', () => {

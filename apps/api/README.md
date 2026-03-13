@@ -212,7 +212,7 @@ Marcado `@Global()`. Implementa `IAuditLogger`:
 | `report_id` | UUID | FK lógica (sem relação TypeORM) |
 | `event_type` | VARCHAR(50) | `llm_called \| llm_succeeded \| llm_failed` |
 | `provider` | VARCHAR(100) | ex: `openrouter` |
-| `model` | VARCHAR(150) | ex: `google/gemini-2.5-flash` |
+| `model` | VARCHAR(150) | ex: `meta-llama/llama-3.3-70b-instruct:free` |
 | `prompt_sent` | TEXT | prompt completo enviado |
 | `raw_response` | TEXT | nullable |
 | `error_message` | TEXT | nullable |
@@ -290,7 +290,7 @@ OPENROUTER_API_KEY=sk-or-v1-... docker-compose up --build
 | `DATABASE_URL` | Sim | — | Connection string PostgreSQL (ex: `postgresql://user:password@host:5432/dbname`) |
 | `OPENROUTER_API_KEY` | Sim | — | Chave da API OpenRouter (`sk-or-v1-...`) |
 | `PORT` | Não | `3001` | Porta HTTP |
-| `OPENROUTER_MODEL` | Não | `google/gemini-2.5-flash` | Modelo LLM |
+| `OPENROUTER_MODEL` | Não | `meta-llama/llama-3.3-70b-instruct:free` | Modelo LLM |
 | `LLM_PROVIDER_NAME` | Não | `openrouter` | Identificador do provider (auditoria) |
 | `CORS_ORIGIN` | Não | `http://localhost:3000` | Origem permitida pelo CORS |
 | `NODE_ENV` | Não | `development` | Ambiente |

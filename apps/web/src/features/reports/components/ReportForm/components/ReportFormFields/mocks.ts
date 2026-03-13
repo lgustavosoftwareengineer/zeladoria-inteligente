@@ -23,7 +23,7 @@ export function buildMockHandleSubmit(): UseFormHandleSubmit<ReportFormValues> {
           e?.preventDefault?.()
           fn({} as ReportFormValues)
         },
-    ) as unknown as UseFormHandleSubmit<ReportFormValues>
+    ) as UseFormHandleSubmit<ReportFormValues>
 }
 
 export const DEFAULT_PROPS = {
@@ -32,7 +32,7 @@ export const DEFAULT_PROPS = {
   onSubmit: jest.fn(),
   errors: {} as FieldErrors<ReportFormValues>,
   dirtyFields: {} as Partial<Record<keyof ReportFormValues, boolean>>,
-  setValue: jest.fn() as unknown as UseFormSetValue<ReportFormValues>,
+  setValue: jest.fn() as UseFormSetValue<ReportFormValues>,
   cepMutation: buildMockMutation<ViaCepAddress, string>(),
   reportMutation: buildMockMutation<ReportResponse, CreateReportDto>(),
   handleCepBlur: jest.fn(),

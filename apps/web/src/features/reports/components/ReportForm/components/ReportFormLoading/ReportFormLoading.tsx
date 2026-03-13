@@ -8,7 +8,7 @@ export function ReportFormLoading() {
         aria-hidden
       />
       <p className="text-gray-600 font-medium">
-        Espera só um momento que estamos analisando a sua ocorrência
+        Espera só um momento que estamos analisando a sua ocorrência &nbsp;
         <span className="inline-flex" aria-hidden>
           <span
             className="animate-loading-dot"

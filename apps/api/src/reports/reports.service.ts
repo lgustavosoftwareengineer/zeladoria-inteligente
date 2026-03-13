@@ -12,13 +12,17 @@ import {
 import { CreateReportDto } from '@/reports/dto/create-report.dto';
 import { ReportResponseDto } from '@/reports/dto/report-response.dto';
 import { Report } from '@/reports/entities/report.entity';
-import { ReportsRepository } from '@/reports/reports.repository';
+import {
+  type IReportsRepository,
+  ReportsRepository,
+} from '@/reports/reports.repository';
 import type { IAuditLogger, ILlmAnalyzer } from '@/core/ports';
 
 @Injectable()
 export class ReportsService {
   constructor(
-    private readonly reportsRepository: ReportsRepository,
+    @Inject(ReportsRepository)
+    private readonly reportsRepository: IReportsRepository,
     @Inject(LLM_ANALYZER_PORT) private readonly llmAnalyzer: ILlmAnalyzer,
     @Inject(AUDIT_LOGGER_PORT) private readonly auditLogger: IAuditLogger,
   ) {}

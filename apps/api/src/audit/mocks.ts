@@ -1,22 +1,24 @@
-import type { AuditRepository } from '@/audit/audit.repository';
-import type { ConfigService } from '@nestjs/config';
+import type { IAuditRepository } from '@/audit/audit.repository';
+import type { AuditLog } from '@/audit/entities/audit-log.entity';
 
 export function buildMockAuditRepository(): {
-  repository: jest.Mocked<AuditRepository>;
-  saveMock: jest.Mock;
+  repository: jest.Mocked<IAuditRepository>;
+  saveMock: jest.MockedFunction<IAuditRepository['save']>;
 } {
-  const saveMock = jest.fn();
+  const saveMock = jest.fn<Promise<AuditLog>, [Partial<AuditLog>]>();
   const repository = {
     save: saveMock,
-    findByReportId: jest.fn(),
-  } as unknown as jest.Mocked<AuditRepository>;
+    findByReportId: jest.fn<Promise<AuditLog[]>, [string]>(),
+  };
   return { repository, saveMock };
 }
 
-export function buildMockConfigService(): jest.Mocked<ConfigService> {
+export function buildMockConfigService() {
   return {
     get: jest.fn((key: string) =>
-      key === 'LLM_PROVIDER_NAME' ? 'openrouter' : 'google/gemini-2.5-flash',
+      key === 'LLM_PROVIDER_NAME'
+        ? 'openrouter'
+        : 'meta-llama/llama-3.3-70b-instruct:free',
     ),
-  } as unknown as jest.Mocked<ConfigService>;
+  };
 }

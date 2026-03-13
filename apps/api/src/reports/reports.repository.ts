@@ -3,6 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Report } from '@/reports/entities/report.entity';
 
+export interface IReportsRepository {
+  save(reportData: Partial<Report>): Promise<Report>;
+  findAll(): Promise<Report[]>;
+  findById(id: string): Promise<Report | null>;
+}
+
 @Injectable()
 export class ReportsRepository {
   constructor(

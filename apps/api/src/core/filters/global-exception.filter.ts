@@ -12,11 +12,12 @@ import {
   LlmUnavailableError,
   LlmValidationError,
 } from '@/core/errors';
-
-export const MESSAGE_LLM_UNAVAILABLE = 'AI service temporarily unavailable';
-export const MESSAGE_LLM_VALIDATION_FAILED = 'AI response validation failed';
-export const MESSAGE_LLM_PARSE_ERROR = 'AI response format error';
-export const MESSAGE_INTERNAL_ERROR = 'Internal server error';
+import {
+  MESSAGE_INTERNAL_ERROR,
+  MESSAGE_LLM_PARSE_ERROR,
+  MESSAGE_LLM_UNAVAILABLE,
+  MESSAGE_LLM_VALIDATION_FAILED,
+} from '@/core/filters/global-exception.constants';
 
 const LLM_ERROR_RESPONSES = {
   LlmUnavailableError: {

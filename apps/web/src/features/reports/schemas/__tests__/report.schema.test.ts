@@ -213,7 +213,6 @@ describe("buildReportResolver('simple')", () => {
       title: "Buraco na rua",
       description: "Há um buraco enorme na calçada.",
       locationText: "Próximo ao terminal de ônibus central",
-      locationMode: undefined,
       cep: "",
       street: "",
       number: "",
@@ -221,7 +220,7 @@ describe("buildReportResolver('simple')", () => {
       neighborhood: "",
       city: "",
       state: "",
-    } as unknown as ReportFormValues
+    }
 
     // Act
     const result = await simpleResolver(values, undefined, {} as never)

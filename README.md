@@ -2,11 +2,10 @@
 
 Sistema de triagem inteligente de relatos urbanos. Cidadãos descrevem um problema urbano (título, descrição, localização) e a IA classifica automaticamente a categoria, prioridade e gera um resumo técnico para administradores públicos.
 
-|                | Link                                                   |
-| -------------- | ------------------------------------------------------ |
-| **Frontend**   | https://zeladoria-inteligente-web.vercel.app           |
-| **API**        | https://ydrbaon8dh.execute-api.us-east-1.amazonaws.com |
-| **Swagger UI** | indisponível em produção                               |
+|              | Link                                                   |
+| ------------ | ------------------------------------------------------ |
+| **Frontend** | https://zeladoria-inteligente-web.vercel.app           |
+| **API**      | https://ydrbaon8dh.execute-api.us-east-1.amazonaws.com |
 
 ## Estrutura do monorepo
 
@@ -25,7 +24,7 @@ Sistema de triagem inteligente de relatos urbanos. Cidadãos descrevem um proble
 | Frontend       | Next.js 15, TypeScript, Tailwind CSS, TanStack Query |
 | Backend        | NestJS, TypeScript strict, TypeORM                   |
 | Banco de dados | PostgreSQL via Supabase (free tier)                  |
-| IA             | OpenRouter → `google/gemini-2.5-flash`               |
+| IA             | OpenRouter → `meta-llama/llama-3.3-70b-instruct:free` |
 | Validação      | Zod (LLM + env) · class-validator (DTOs HTTP)        |
 | Infra          | Terraform · AWS Lambda + API Gateway + SSM           |
 | Deploy         | Vercel (frontend) · AWS Lambda (backend)             |
@@ -42,7 +41,7 @@ sequenceDiagram
     participant Web as Next.js (Vercel)
     participant API as NestJS (AWS Lambda)
     participant DB as PostgreSQL (Supabase)
-    participant LLM as OpenRouter (Gemini 2.5 Flash)
+    participant LLM as OpenRouter (Llama 3.3 70B Instruct)
     participant Audit as Tabela audit_logs
 
     Cidadão->>Web: Preenche formulário e envia
@@ -89,7 +88,7 @@ graph TB
     end
 
     subgraph OpenRouter["OpenRouter"]
-        Gemini["google/gemini-2.5-flash"]
+        Llama["meta-llama/llama-3.3-70b-instruct:free"]
     end
 
     Cidadão([Cidadão]) --> Web
@@ -97,7 +96,7 @@ graph TB
     APIGW --> Lambda
     Lambda -->|"lê secrets na inicialização"| SSM
     Lambda -->|"TypeORM"| PG
-    Lambda -->|"openai SDK (baseURL customizada)"| Gemini
+    Lambda -->|"openai SDK (baseURL customizada)"| Llama
 ```
 
 ---
@@ -121,7 +120,7 @@ npm install
 
 1. Acesse [openrouter.ai](https://openrouter.ai) e crie uma conta gratuita
 2. No dashboard, vá em **Keys → Create Key**
-3. O modelo `google/gemini-2.5-flash` tem créditos gratuitos disponíveis para novos usuários
+3. Use o modelo `meta-llama/llama-3.3-70b-instruct:free`, que está disponível na OpenRouter com faixa gratuita para novos usuários
 4. Copie a chave gerada (formato `sk-or-v1-...`)
 
 > Para um guia visual passo a passo, consulte a [documentação oficial da OpenRouter](https://openrouter.ai/docs/api-keys).

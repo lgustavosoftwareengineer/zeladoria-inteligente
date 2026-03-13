@@ -6,7 +6,7 @@ export const STUB_AUDIT_LOG: AuditLog = {
   reportId: 'report-uuid-1',
   eventType: AuditEvent.LLM_SUCCEEDED,
   provider: 'openrouter',
-  model: 'google/gemini-2.5-flash',
+  model: 'meta-llama/llama-3.3-70b-instruct:free',
   promptSent: 'test prompt',
   rawResponse: '{"category":"Via Pública"}',
   errorMessage: null,

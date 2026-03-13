@@ -8,16 +8,14 @@ import { STUB_AUDIT_LOG } from '@/audit/stubs';
 
 describe('AuditService', () => {
   let service: AuditService;
-  let repository: ReturnType<typeof buildMockAuditRepository>['repository'];
-  let saveMock: jest.Mock;
+  let saveMock: ReturnType<typeof buildMockAuditRepository>['saveMock'];
   let configService: ReturnType<typeof buildMockConfigService>;
 
   beforeEach(() => {
-    const repo = buildMockAuditRepository();
-    repository = repo.repository;
-    saveMock = repo.saveMock;
+    const repositoryMock = buildMockAuditRepository();
+    saveMock = repositoryMock.saveMock;
     configService = buildMockConfigService();
-    service = new AuditService(repository, configService);
+    service = new AuditService(repositoryMock.repository, configService);
   });
 
   describe('createLog', () => {
@@ -40,7 +38,7 @@ describe('AuditService', () => {
           reportId: 'report-uuid-1',
           eventType: AuditEvent.LLM_SUCCEEDED,
           provider: 'openrouter',
-          model: 'google/gemini-2.5-flash',
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
           latencyMs: 300,
         }),
       );

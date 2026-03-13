@@ -1,8 +1,11 @@
-import type { ILlmProvider } from '@/llm/providers/llm-provider.interface';
+type LlmProviderMock = {
+  providerName: string;
+  complete: jest.Mock<Promise<string>, [string]>;
+};
 
-export function buildMockOpenRouterProvider(): jest.Mocked<ILlmProvider> {
+export function buildMockOpenRouterProvider(): LlmProviderMock {
   return {
     providerName: 'openrouter',
-    complete: jest.fn(),
+    complete: jest.fn<Promise<string>, [string]>(),
   };
 }

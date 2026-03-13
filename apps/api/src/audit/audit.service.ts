@@ -1,18 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   DEFAULT_LLM_PROVIDER_NAME,
   DEFAULT_OPENROUTER_MODEL,
-  Env,
 } from '@/core/config';
-import { AuditEvent, CreateAuditLogParams, IAuditLogger } from '@/core/ports';
-import { AuditRepository } from '@/audit/audit.repository';
+import { AuditEvent } from '@/core/ports';
+import {
+  AuditRepository,
+  type IAuditRepository,
+} from '@/audit/audit.repository';
+import type {
+  CreateAuditLogParams,
+  IAuditLogger,
+  IConfigReader,
+} from '@/core/ports';
 
 @Injectable()
 export class AuditService implements IAuditLogger {
   constructor(
-    private readonly auditRepository: AuditRepository,
-    private readonly config: ConfigService<Env>,
+    @Inject(AuditRepository)
+    private readonly auditRepository: IAuditRepository,
+    @Inject(ConfigService)
+    private readonly config: IConfigReader,
   ) {}
 
   async createLog(params: CreateAuditLogParams): Promise<void> {

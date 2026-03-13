@@ -16,6 +16,6 @@ export function buildMockArgumentsHost(overrides?: {
       getResponse: () => ({ status: statusMock }),
       getRequest: () => ({ method: 'POST', url: '/api/reports' }),
     }),
-  } as unknown as ArgumentsHost;
+  } as ArgumentsHost;
   return { host, statusMock, jsonMock };
 }

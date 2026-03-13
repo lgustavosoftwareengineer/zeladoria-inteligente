@@ -21,4 +21,6 @@ export const IDLE_HOOK_RETURN = {
   handleNewReport: jest.fn(),
   errors: {},
   dirtyFields: {},
-} as unknown as ReturnType<typeof useReportForm>
+  locationMode: "simple" as const,
+  toggleLocationMode: jest.fn(),
+} as ReturnType<typeof useReportForm>

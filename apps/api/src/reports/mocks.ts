@@ -1,18 +1,18 @@
 import type { IAuditLogger, ILlmAnalyzer } from '@/core/ports';
-import type { ReportsRepository } from '@/reports/reports.repository';
+import type { IReportsRepository } from '@/reports/reports.repository';
 
-export function buildMockReportsRepository(): jest.Mocked<ReportsRepository> {
+export function buildMockReportsRepository(): jest.Mocked<IReportsRepository> {
   return {
     save: jest.fn(),
     findAll: jest.fn(),
     findById: jest.fn(),
-  } as unknown as jest.Mocked<ReportsRepository>;
+  };
 }
 
 export function buildMockLlmAnalyzer(): jest.Mocked<ILlmAnalyzer> {
   return {
     analyze: jest.fn(),
-  } as unknown as jest.Mocked<ILlmAnalyzer>;
+  };
 }
 
 export function buildMockAuditLogger(): {

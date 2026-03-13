@@ -57,7 +57,7 @@ describe('LlmService', () => {
 
       // Assert
       await assertion;
-      expect(mockProvider.complete).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+      expect(mockProvider.complete.mock.calls).toHaveLength(MAX_ATTEMPTS);
     });
 
     it('should throw LlmUnavailableError after MAX_ATTEMPTS parse failures', async () => {
@@ -72,7 +72,7 @@ describe('LlmService', () => {
 
       // Assert
       await assertion;
-      expect(mockProvider.complete).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+      expect(mockProvider.complete.mock.calls).toHaveLength(MAX_ATTEMPTS);
     });
 
     it('should throw LlmUnavailableError after MAX_ATTEMPTS schema validation failures', async () => {
@@ -87,7 +87,7 @@ describe('LlmService', () => {
 
       // Assert
       await assertion;
-      expect(mockProvider.complete).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+      expect(mockProvider.complete.mock.calls).toHaveLength(MAX_ATTEMPTS);
     });
 
     it('should recover on third attempt after two parse failures', async () => {
@@ -104,7 +104,7 @@ describe('LlmService', () => {
 
       // Assert
       expect(result.output.category).toBe('Via Pública');
-      expect(mockProvider.complete).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+      expect(mockProvider.complete.mock.calls).toHaveLength(MAX_ATTEMPTS);
     });
 
     it('should throw LlmUnavailableError when category is not in enum', async () => {

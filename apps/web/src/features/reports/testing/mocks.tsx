@@ -25,7 +25,7 @@ export function buildMockMutation<TData, TVariables>(
     submittedAt: 0,
     context: undefined,
     ...overrides,
-  } as unknown as UseMutationResult<TData, Error, TVariables>
+  } as UseMutationResult<TData, Error, TVariables>
 }
 
 export function buildMockRegister(): UseFormRegister<ReportFormValues> {
@@ -41,7 +41,7 @@ export function buildMockRegister(): UseFormRegister<ReportFormValues> {
         onBlur: opts?.onBlur ?? jest.fn(),
         ref: jest.fn(),
       }),
-    ) as unknown as UseFormRegister<ReportFormValues>
+    ) as UseFormRegister<ReportFormValues>
 }
 
 export function renderWithProviders(ui: ReactElement) {
