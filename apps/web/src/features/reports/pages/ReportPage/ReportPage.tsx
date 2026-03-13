@@ -9,8 +9,8 @@ export function ReportPage() {
             Zeladoria Inteligente
           </h1>
           <p className="mt-2 text-sm text-gray-500">
-            Mande aqui o problema urbano que está acontecendo pertinho de você e
-            vamos lhe ajudar a classificá-lo melhor!
+            Viu algum problema na sua rua ou bairro? Conta aqui que a gente
+            classifica e encaminha pra quem pode resolver.
           </p>
         </div>
 
