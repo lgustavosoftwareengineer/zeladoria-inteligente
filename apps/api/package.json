@@ -17,9 +17,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "migration:generate": "cross-env TS_NODE_PROJECT=tsconfig.migration.json typeorm-ts-node-commonjs migration:generate -d src/core/database/data-source.ts",
-    "migration:run": "cross-env TS_NODE_PROJECT=tsconfig.migration.json typeorm-ts-node-commonjs migration:run -d src/core/database/data-source.ts",
-    "migration:revert": "cross-env TS_NODE_PROJECT=tsconfig.migration.json typeorm-ts-node-commonjs migration:revert -d src/core/database/data-source.ts"
+    "migration:generate": "cross-env TS_NODE_PROJECT=tsconfig.migration.json NODE_OPTIONS=--no-deprecation typeorm-ts-node-commonjs migration:generate -d src/core/database/data-source.ts",
+    "migration:run": "cross-env TS_NODE_PROJECT=tsconfig.migration.json NODE_OPTIONS=--no-deprecation typeorm-ts-node-commonjs migration:run -d src/core/database/data-source.ts",
+    "migration:revert": "cross-env TS_NODE_PROJECT=tsconfig.migration.json NODE_OPTIONS=--no-deprecation typeorm-ts-node-commonjs migration:revert -d src/core/database/data-source.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
