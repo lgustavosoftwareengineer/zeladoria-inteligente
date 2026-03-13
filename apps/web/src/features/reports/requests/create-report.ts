@@ -12,9 +12,9 @@ export async function createReport(
   })
 
   if (!response.ok) {
-    const error = (await response.json().catch(() => ({}))) as {
+    const error = await response.json().catch<{
       message?: string
-    }
+    }>(() => ({}))
     throw new Error(error.message ?? "Serviço temporariamente indisponível.")
   }
 
