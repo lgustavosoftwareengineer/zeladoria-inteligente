@@ -1,0 +1,3 @@
+database_url       = "postgresql://user:password@host:5432/dbname"
+openrouter_api_key = "sk-or-v1-your-key-here"
+cors_origin        = "https://your-app.vercel.app"
