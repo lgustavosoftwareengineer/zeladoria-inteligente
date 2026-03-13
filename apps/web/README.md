@@ -144,73 +144,6 @@ graph TB
     LSF --> UI
 ```
 
-### Diagrama de sequência — submissão do formulário
-
-```mermaid
-sequenceDiagram
-    actor Cidadão
-    participant RF as ReportForm
-    participant Hook as useReportForm
-    participant RHF as React Hook Form
-    participant Zod as report.schema (Zod)
-    participant Req as createReport()
-    participant API as NestJS API
-
-    Cidadão->>RF: Preenche título, descrição e localização
-    Cidadão->>RF: Clica em "Enviar relato"
-
-    RF->>Hook: form.handleSubmit(onSubmit)
-    Hook->>RHF: valida campos
-    RHF->>Zod: buildReportResolver(locationMode)(values)
-
-    alt Validação falhou
-        Zod-->>RHF: errors
-        RHF-->>RF: exibe erros inline
-        RF->>Cidadão: Campos marcados em vermelho
-    else Validação ok
-        Zod-->>Hook: values
-        Hook->>Hook: formata location (simples ou endereço completo)
-        Hook->>Req: reportMutation.mutate({ title, description, location })
-        RF->>Cidadão: Exibe ReportFormLoading (skeleton)
-
-        Req->>API: POST /api/reports
-        API-->>Req: 201 ReportResponseDto
-
-        Req-->>Hook: reportMutation.isSuccess = true
-        Hook-->>RF: data = ReportResponseDto
-        RF->>Cidadão: Exibe ReportFormSuccess (categoria, prioridade, resumo)
-    end
-```
-
-### Diagrama de sequência — busca de endereço por CEP
-
-```mermaid
-sequenceDiagram
-    actor Cidadão
-    participant LDF as LocationDetailedFields
-    participant Hook as useReportForm
-    participant ViaCEP as services/viacep
-    participant API as viacep.com.br
-
-    Cidadão->>LDF: Digita CEP e sai do campo (blur)
-    LDF->>Hook: handleCepBlur(event)
-    Hook->>Hook: remove não-dígitos → verifica 8 dígitos
-    Hook->>ViaCEP: cepMutation.mutate(cep)
-    ViaCEP->>API: GET /ws/{cep}/json/
-
-    alt CEP encontrado
-        API-->>ViaCEP: { logradouro, bairro, localidade, uf }
-        ViaCEP-->>Hook: address
-        Hook->>Hook: setValue(street, neighborhood, city, state)
-        Hook-->>LDF: campos preenchidos automaticamente
-    else CEP inválido
-        API-->>ViaCEP: erro / CEP não encontrado
-        ViaCEP-->>Hook: Error
-        Hook->>Hook: setError("cep", message)
-        Hook-->>LDF: exibe erro no campo CEP
-    end
-```
-
 ---
 
 ## Features
@@ -250,7 +183,7 @@ idle → loading → success
 
 ## Componentes globais
 
-Todos em `src/components/ui/`. Nenhum usa Shadcn UI — estilização apenas com Tailwind CSS.
+Todos em `src/components/ui/`.
 
 | Componente | Padrão | Variantes                   |
 | ---------- | ------ | --------------------------- |

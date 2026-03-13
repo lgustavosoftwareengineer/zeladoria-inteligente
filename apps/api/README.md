@@ -351,7 +351,7 @@ sequenceDiagram
     participant GH as GitHub Actions
     participant Lambda as AWS Lambda
 
-    Dev->>TF: terraform apply -var-file="prod.tfvars"
+    Dev->>TF: terraform apply -var-file="terraform.tfvars"
     TF->>AWS: Cria API Gateway, Lambda (placeholder), SSM, IAM
     TF-->>Dev: outputs (API URL, Lambda ARN)
 
@@ -368,15 +368,12 @@ sequenceDiagram
 ```bash
 cd apps/api/infra
 
+# Crie o arquivo de variáveis a partir do exemplo e edite com os valores reais
+cp terraform.tfvars.example terraform.tfvars
+
 terraform init
-terraform plan  -var-file="prod.tfvars"
-terraform apply -var-file="prod.tfvars"
+terraform plan  -var-file="terraform.tfvars"
+terraform apply -var-file="terraform.tfvars"
 ```
 
-Exemplo de `prod.tfvars` (não commitado — está no `.gitignore`):
-
-```hcl
-database_url       = "postgresql://..."
-openrouter_api_key = "sk-or-v1-..."
-cors_origin        = "https://seu-app.vercel.app"
-```
+O arquivo `terraform.tfvars` não é gerado automaticamente. Crie-o com `cp terraform.tfvars.example terraform.tfvars` e preencha os valores (ele não é commitado — `*.tfvars` está no `.gitignore` da pasta `infra/`). O `terraform.tfvars.example` contém apenas placeholders.
