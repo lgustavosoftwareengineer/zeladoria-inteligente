@@ -105,7 +105,7 @@ graph TB
 
 ### Pré-requisitos
 
-- Node.js 22+
+- Node.js 22.13.0+ (use `nvm use` na raiz do projeto — versão em `.nvmrc`)
 - Docker + Docker Compose (para o PostgreSQL local)
 - Uma chave da OpenRouter — veja [como criar abaixo](#obtendo-uma-chave-da-openrouter)
 

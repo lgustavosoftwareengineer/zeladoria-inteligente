@@ -254,7 +254,7 @@ Swagger UI (apenas em desenvolvimento): `http://localhost:3001/api/docs`
 
 ### Pré-requisitos
 
-- Node.js 22+
+- Node.js 22.13.0+ (versão em `.nvmrc` na raiz — `nvm use`)
 - Docker + Docker Compose
 - Chave da OpenRouter — [como obter](../../README.md#obtendo-uma-chave-da-openrouter)
 
