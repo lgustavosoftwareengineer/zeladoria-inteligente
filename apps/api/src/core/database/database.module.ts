@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -16,6 +17,10 @@ import { Env } from '@/core/config';
           autoLoadEntities: true,
           synchronize: !isProduction,
           ssl: isProduction ? { rejectUnauthorized: false } : false,
+          migrations: isProduction
+            ? [join(__dirname, 'migrations', '*.js')]
+            : [],
+          migrationsRun: isProduction,
         };
       },
     }),

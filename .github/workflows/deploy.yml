@@ -29,10 +29,16 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm run test -w @zeladoria-inteligente/api
+        run: npm run api:test
+
+      - name: Run migrations
+        run: npm run api:migration:run
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: production
 
       - name: Build
-        run: npm run build -w @zeladoria-inteligente/api
+        run: npm run api:build
 
       - name: Create deployment package
         run: |

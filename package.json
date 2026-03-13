@@ -6,12 +6,15 @@
   ],
   "scripts": {
     "prepare": "node --eval \"process.env.CI || process.exit(1)\" || husky",
-    "build": "npm run build -w @zeladoria-inteligente/api",
-    "test": "npm run test:api && npm run test:web",
-    "test:api": "npm run test -w @zeladoria-inteligente/api",
-    "test:web": "npm run test -w @zeladoria-inteligente/web",
-    "dev:api": "npm run start:dev -w @zeladoria-inteligente/api",
-    "dev:web": "npm run dev -w @zeladoria-inteligente/web"
+    "test": "npm run api:test && npm run web:test",
+    "api:build": "npm run build -w @zeladoria-inteligente/api",
+    "api:test": "npm run test -w @zeladoria-inteligente/api",
+    "api:dev": "npm run start:dev -w @zeladoria-inteligente/api",
+    "api:migration:generate": "npm run migration:generate -w @zeladoria-inteligente/api",
+    "api:migration:run": "npm run migration:run -w @zeladoria-inteligente/api",
+    "api:migration:revert": "npm run migration:revert -w @zeladoria-inteligente/api",
+    "web:test": "npm run test -w @zeladoria-inteligente/web",
+    "web:dev": "npm run dev -w @zeladoria-inteligente/web"
   },
   "devDependencies": {
     "husky": "^9.1.7",
