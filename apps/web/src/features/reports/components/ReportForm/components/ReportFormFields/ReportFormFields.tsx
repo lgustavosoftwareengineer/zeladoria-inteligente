@@ -10,11 +10,11 @@ import { LocationSimpleField } from "./components/LocationSimpleField"
 import type {
   LocationMode,
   ReportFormValues,
-} from "../../../../schemas/report.schema"
+} from "@/features/reports/schemas/report.schema"
 import type {
   CreateReportDto,
   ReportResponse,
-} from "../../../../types/report.types"
+} from "@/features/reports/types/report.types"
 import type { UseMutationResult } from "@tanstack/react-query"
 import type {
   FieldErrors,
