@@ -23,7 +23,7 @@ describe("Input", () => {
     render(<Input readOnly />)
 
     // Assert
-    expect(screen.getByRole("textbox")).toHaveClass("bg-blue-50")
+    expect(screen.getByRole("textbox")).toHaveClass("bg-gray-50")
   })
 
   it("should not apply readOnly styles when readOnly is false", () => {
@@ -31,7 +31,7 @@ describe("Input", () => {
     render(<Input readOnly={false} />)
 
     // Assert
-    expect(screen.getByRole("textbox")).not.toHaveClass("bg-blue-50")
+    expect(screen.getByRole("textbox")).not.toHaveClass("bg-gray-50")
   })
 
   it("should forward placeholder", () => {

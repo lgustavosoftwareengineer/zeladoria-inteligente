@@ -28,6 +28,7 @@ export function LocationDetailedFields({
   onCepBlur,
   onCepChange,
 }: LocationDetailedFieldsProps) {
+  const { isPending: isLoading } = cepMutation
   const shouldAddressFieldBeReadonly =
     cepMutation.isSuccess && !!dirtyFields.cep
 
@@ -54,7 +55,7 @@ export function LocationDetailedFields({
                 onChange: onCepChange,
               })}
             />
-            {cepMutation.isPending && (
+            {isLoading && (
               <div
                 className="absolute right-3 top-1/2 -translate-y-1/2 flex h-4 w-4 items-center justify-center"
                 aria-hidden

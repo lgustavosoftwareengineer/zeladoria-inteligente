@@ -11,7 +11,7 @@ export function Textarea({ className, readOnly, ...props }: TextareaProps) {
       className={cn(
         "w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm outline-none transition resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:bg-gray-50 disabled:text-gray-400",
         readOnly &&
-          "bg-blue-50 border-blue-200 text-blue-800 cursor-default focus:border-blue-200 focus:ring-0",
+          "bg-gray-50 border-gray-200 text-gray-500 cursor-default focus:border-gray-200 focus:ring-0",
         className,
       )}
       readOnly={readOnly}
