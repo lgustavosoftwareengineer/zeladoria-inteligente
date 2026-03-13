@@ -4,7 +4,7 @@ Sistema de triagem inteligente de relatos urbanos. Cidadãos descrevem um proble
 
 | | Link |
 |---|---|
-| **Frontend** | https://zeladoria-inteligente-3zishia4r-tonicprisms-projects.vercel.app |
+| **Frontend** | https://zeladoria-inteligente-web.vercel.app |
 | **API** | https://ydrbaon8dh.execute-api.us-east-1.amazonaws.com |
 | **Swagger UI** | indisponível em produção |
 
