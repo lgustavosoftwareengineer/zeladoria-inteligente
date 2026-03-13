@@ -28,6 +28,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.6",
     "@nestjs/typeorm": "^11.0.0",
+    "@vendia/serverless-express": "^4.10.4",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "openai": "^6.27.0",
@@ -35,8 +36,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.28",
-    "zod": "^4.3.6",
-    "@vendia/serverless-express": "^4.10.4"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -44,11 +44,13 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
+    "@types/aws-lambda": "^8.10.149",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
     "@types/pg": "^8.18.0",
-    "@types/supertest": "^6.0.2",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -58,16 +60,12 @@
     "jest": "^30.0.0",
     "prettier": "^3.4.2",
     "source-map-support": "^0.5.21",
-    "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0",
-    "@types/aws-lambda": "^8.10.149",
-    "cross-env": "^7.0.3",
-    "dotenv": "^16.4.7"
+    "typescript-eslint": "^8.20.0"
   },
   "jest": {
     "moduleNameMapper": {
