@@ -2,11 +2,11 @@
 
 Sistema de triagem inteligente de relatos urbanos. Cidadãos descrevem um problema urbano (título, descrição, localização) e a IA classifica automaticamente a categoria, prioridade e gera um resumo técnico para administradores públicos.
 
-| | Link |
-|---|---|
-| **Frontend** | https://zeladoria-inteligente-web.vercel.app |
-| **API** | https://ydrbaon8dh.execute-api.us-east-1.amazonaws.com |
-| **Swagger UI** | indisponível em produção |
+|                | Link                                                   |
+| -------------- | ------------------------------------------------------ |
+| **Frontend**   | https://zeladoria-inteligente-web.vercel.app           |
+| **API**        | https://ydrbaon8dh.execute-api.us-east-1.amazonaws.com |
+| **Swagger UI** | indisponível em produção                               |
 
 ## Estrutura do monorepo
 
@@ -15,22 +15,20 @@ Sistema de triagem inteligente de relatos urbanos. Cidadãos descrevem um proble
 ├── apps/
 │   ├── api/          # NestJS — REST API + integração LLM
 │   └── web/          # Next.js — Interface do cidadão
-├── docs/
-│   └── DESCRIPTION.MD
 └── package.json      # Workspaces + Husky + lint-staged
 ```
 
 ## Stack
 
-| Camada | Tecnologia |
-|---|---|
-| Frontend | Next.js 15, TypeScript, Tailwind CSS, TanStack Query |
-| Backend | NestJS, TypeScript strict, TypeORM |
-| Banco de dados | PostgreSQL via Supabase (free tier) |
-| IA | OpenRouter → `google/gemini-2.5-flash` |
-| Validação | Zod (LLM + env) · class-validator (DTOs HTTP) |
-| Infra | Terraform · AWS Lambda + API Gateway + SSM |
-| Deploy | Vercel (frontend) · AWS Lambda (backend) |
+| Camada         | Tecnologia                                           |
+| -------------- | ---------------------------------------------------- |
+| Frontend       | Next.js 15, TypeScript, Tailwind CSS, TanStack Query |
+| Backend        | NestJS, TypeScript strict, TypeORM                   |
+| Banco de dados | PostgreSQL via Supabase (free tier)                  |
+| IA             | OpenRouter → `google/gemini-2.5-flash`               |
+| Validação      | Zod (LLM + env) · class-validator (DTOs HTTP)        |
+| Infra          | Terraform · AWS Lambda + API Gateway + SSM           |
+| Deploy         | Vercel (frontend) · AWS Lambda (backend)             |
 
 ---
 
@@ -178,11 +176,11 @@ O pre-commit (Husky) executa `test:api` e `test:web` antes de cada commit.
 
 ## Deploy
 
-| Serviço | Plataforma | Documentação |
-|---|---|---|
-| Frontend | Vercel (push para `main`) | [apps/web/README.md](apps/web/README.md) |
-| Backend | AWS Lambda via GitHub Actions | [apps/api/README.md](apps/api/README.md) |
-| Infra | Terraform (`apps/api/infra/`) | [apps/api/README.md](apps/api/README.md) |
+| Serviço  | Plataforma                    | Documentação                             |
+| -------- | ----------------------------- | ---------------------------------------- |
+| Frontend | Vercel (push para `main`)     | [apps/web/README.md](apps/web/README.md) |
+| Backend  | AWS Lambda via GitHub Actions | [apps/api/README.md](apps/api/README.md) |
+| Infra    | Terraform (`apps/api/infra/`) | [apps/api/README.md](apps/api/README.md) |
 
 ---
 
