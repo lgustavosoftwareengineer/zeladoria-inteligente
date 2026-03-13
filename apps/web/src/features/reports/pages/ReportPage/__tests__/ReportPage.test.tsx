@@ -4,10 +4,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { fetchAddressByCep } from "@/services/viacep"
-import { ReportForm } from "../components/ReportForm"
-import { createReport } from "../requests/create-report"
+import { createReport } from "../../../requests/create-report"
+import { ReportPage } from "../ReportPage"
 
-jest.mock("../requests/create-report")
+jest.mock("../../../requests/create-report")
 jest.mock("@/services/viacep")
 
 const mockCreateReport = createReport as jest.MockedFunction<
@@ -44,7 +44,7 @@ function renderWithProviders() {
   })
   return render(
     <QueryClientProvider client={queryClient}>
-      <ReportForm />
+      <ReportPage />
     </QueryClientProvider>,
   )
 }
@@ -77,7 +77,7 @@ async function fillRequiredFields() {
   await userEvent.type(screen.getByLabelText(/uf/i), "SP")
 }
 
-describe("Report Submission Feature", () => {
+describe("ReportPage", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockFetchAddressByCep.mockResolvedValue(MOCK_ADDRESS)
