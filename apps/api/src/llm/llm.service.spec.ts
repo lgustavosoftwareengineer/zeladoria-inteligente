@@ -1,59 +1,45 @@
 import { LlmUnavailableError } from '@/core/errors';
 import { MAX_ATTEMPTS } from '@/llm/llm.constants';
 import { LlmService } from '@/llm/llm.service';
-import { OpenRouterProvider } from '@/llm/providers/openrouter.provider';
-import type { ReportInput } from '@/core/ports';
-
-const VALID_RAW_RESPONSE = JSON.stringify({
-  category: 'Via Pública',
-  priority: 'Alta',
-  technical_summary: 'Dano estrutural identificado em via pública.',
-});
-
-const MOCK_INPUT: ReportInput = {
-  title: 'Buraco na rua',
-  description: 'Buraco enorme na frente da casa',
-  location: 'Rua das Flores, 42',
-};
+import { buildMockOpenRouterProvider } from '@/llm/mocks';
+import { STUB_REPORT_INPUT, STUB_VALID_RAW_RESPONSE } from '@/llm/stubs';
 
 describe('LlmService', () => {
   let service: LlmService;
-  let completeMock: jest.Mock;
-  let mockProvider: jest.Mocked<
-    Pick<OpenRouterProvider, 'complete' | 'providerName'>
-  >;
+  let mockProvider: ReturnType<typeof buildMockOpenRouterProvider>;
 
   beforeEach(() => {
-    completeMock = jest.fn();
-    mockProvider = {
-      providerName: 'openrouter',
-      complete: completeMock,
-    };
-    service = new LlmService(mockProvider as unknown as OpenRouterProvider);
+    jest.useFakeTimers();
+    mockProvider = buildMockOpenRouterProvider();
+    service = new LlmService(mockProvider);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   describe('analyze', () => {
     it('should return parsed output on success', async () => {
       // Arrange
-      completeMock.mockResolvedValue(VALID_RAW_RESPONSE);
+      mockProvider.complete.mockResolvedValue(STUB_VALID_RAW_RESPONSE);
 
       // Act
-      const result = await service.analyze(MOCK_INPUT);
+      const result = await service.analyze(STUB_REPORT_INPUT);
 
       // Assert
       expect(result.output.category).toBe('Via Pública');
       expect(result.output.priority).toBe('Alta');
-      expect(result.rawResponse).toBe(VALID_RAW_RESPONSE);
+      expect(result.rawResponse).toBe(STUB_VALID_RAW_RESPONSE);
       expect(result.latencyMs).toBeGreaterThanOrEqual(0);
     });
 
     it('should strip markdown code fences before parsing', async () => {
       // Arrange
-      const wrappedResponse = `\`\`\`json\n${VALID_RAW_RESPONSE}\n\`\`\``;
-      completeMock.mockResolvedValue(wrappedResponse);
+      const wrappedResponse = `\`\`\`json\n${STUB_VALID_RAW_RESPONSE}\n\`\`\``;
+      mockProvider.complete.mockResolvedValue(wrappedResponse);
 
       // Act
-      const result = await service.analyze(MOCK_INPUT);
+      const result = await service.analyze(STUB_REPORT_INPUT);
 
       // Assert
       expect(result.output.category).toBe('Via Pública');
@@ -61,38 +47,47 @@ describe('LlmService', () => {
 
     it('should throw LlmUnavailableError after MAX_ATTEMPTS failed provider attempts', async () => {
       // Arrange
-      completeMock.mockRejectedValue(new Error('network timeout'));
+      mockProvider.complete.mockRejectedValue(new Error('network timeout'));
 
-      // Act
-      const act = () => service.analyze(MOCK_INPUT);
+      // Act — attach rejection handler before advancing timers to avoid unhandled rejection
+      const assertion = expect(
+        service.analyze(STUB_REPORT_INPUT),
+      ).rejects.toThrow(LlmUnavailableError);
+      await jest.runAllTimersAsync();
 
       // Assert
-      await expect(act()).rejects.toThrow(LlmUnavailableError);
-      expect(completeMock).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+      await assertion;
+      expect(mockProvider.complete).toHaveBeenCalledTimes(MAX_ATTEMPTS);
     });
 
     it('should throw LlmUnavailableError after MAX_ATTEMPTS parse failures', async () => {
       // Arrange
-      completeMock.mockResolvedValue('this is not json at all');
+      mockProvider.complete.mockResolvedValue('this is not json at all');
 
-      // Act
-      const act = () => service.analyze(MOCK_INPUT);
+      // Act — attach rejection handler before advancing timers to avoid unhandled rejection
+      const assertion = expect(
+        service.analyze(STUB_REPORT_INPUT),
+      ).rejects.toThrow(LlmUnavailableError);
+      await jest.runAllTimersAsync();
 
       // Assert
-      await expect(act()).rejects.toThrow(LlmUnavailableError);
-      expect(completeMock).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+      await assertion;
+      expect(mockProvider.complete).toHaveBeenCalledTimes(MAX_ATTEMPTS);
     });
 
     it('should throw LlmUnavailableError after MAX_ATTEMPTS schema validation failures', async () => {
       // Arrange
-      completeMock.mockResolvedValue(JSON.stringify({ foo: 'bar' }));
+      mockProvider.complete.mockResolvedValue(JSON.stringify({ foo: 'bar' }));
 
-      // Act
-      const act = () => service.analyze(MOCK_INPUT);
+      // Act — attach rejection handler before advancing timers to avoid unhandled rejection
+      const assertion = expect(
+        service.analyze(STUB_REPORT_INPUT),
+      ).rejects.toThrow(LlmUnavailableError);
+      await jest.runAllTimersAsync();
 
       // Assert
-      await expect(act()).rejects.toThrow(LlmUnavailableError);
-      expect(completeMock).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+      await assertion;
+      expect(mockProvider.complete).toHaveBeenCalledTimes(MAX_ATTEMPTS);
     });
 
     it('should recover on third attempt after two parse failures', async () => {
@@ -100,19 +95,21 @@ describe('LlmService', () => {
       mockProvider.complete
         .mockResolvedValueOnce('not json')
         .mockResolvedValueOnce('still not json')
-        .mockResolvedValue(VALID_RAW_RESPONSE);
+        .mockResolvedValue(STUB_VALID_RAW_RESPONSE);
 
       // Act
-      const result = await service.analyze(MOCK_INPUT);
+      const promise = service.analyze(STUB_REPORT_INPUT);
+      await jest.runAllTimersAsync();
+      const result = await promise;
 
       // Assert
       expect(result.output.category).toBe('Via Pública');
-      expect(completeMock).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+      expect(mockProvider.complete).toHaveBeenCalledTimes(MAX_ATTEMPTS);
     });
 
     it('should throw LlmUnavailableError when category is not in enum', async () => {
       // Arrange
-      completeMock.mockResolvedValue(
+      mockProvider.complete.mockResolvedValue(
         JSON.stringify({
           category: 'Invalid Category',
           priority: 'Alta',
@@ -120,11 +117,14 @@ describe('LlmService', () => {
         }),
       );
 
-      // Act
-      const act = () => service.analyze(MOCK_INPUT);
+      // Act — attach rejection handler before advancing timers to avoid unhandled rejection
+      const assertion = expect(
+        service.analyze(STUB_REPORT_INPUT),
+      ).rejects.toThrow(LlmUnavailableError);
+      await jest.runAllTimersAsync();
 
       // Assert
-      await expect(act()).rejects.toThrow(LlmUnavailableError);
+      await assertion;
     });
   });
 });

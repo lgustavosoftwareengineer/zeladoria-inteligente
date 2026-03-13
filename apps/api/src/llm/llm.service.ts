@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   LlmParseError,
   LlmUnavailableError,
@@ -7,14 +7,17 @@ import {
 import { ILlmAnalyzer, LlmAnalysisResult, ReportInput } from '@/core/ports';
 import { MAX_ATTEMPTS, RETRY_DELAY_MS } from '@/llm/llm.constants';
 import { buildTriagePrompt } from '@/llm/prompts/triage.prompt';
-import { OpenRouterProvider } from '@/llm/providers/openrouter.provider';
+import {
+  type ILlmProvider,
+  LLM_PROVIDER,
+} from '@/llm/providers/llm-provider.interface';
 import { LlmOutputSchema } from '@/llm/schemas/llm-output.schema';
 
 @Injectable()
 export class LlmService implements ILlmAnalyzer {
   private readonly logger = new Logger(LlmService.name);
 
-  constructor(private readonly provider: OpenRouterProvider) {}
+  constructor(@Inject(LLM_PROVIDER) private readonly provider: ILlmProvider) {}
 
   async analyze(input: ReportInput): Promise<LlmAnalysisResult> {
     const prompt = buildTriagePrompt(input);
