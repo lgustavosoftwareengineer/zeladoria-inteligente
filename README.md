@@ -125,6 +125,8 @@ npm install
 
 > Para um guia visual passo a passo, consulte a [documentação oficial da OpenRouter](https://openrouter.ai/docs/api-keys).
 
+> **Aviso:** Para conseguir fazer requisições à OpenRouter, pode ser necessário ter créditos na conta. Verifique no [dashboard da OpenRouter](https://openrouter.ai/credits) a política de uso e créditos do modelo escolhido.
+
 ### Rodando a API
 
 ```bash
