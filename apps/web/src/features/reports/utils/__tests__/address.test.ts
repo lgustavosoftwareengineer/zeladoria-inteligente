@@ -1,22 +1,11 @@
-import type { ReportFormValues } from "../../schemas/report.schema"
+import type { ReportFormValues } from "@/features/reports/schemas/report.schema"
 import { formatLocation } from "../address"
-
-const BASE_VALUES: ReportFormValues = {
-  title: "Buraco na rua",
-  description: "Buraco grande na calçada.",
-  cep: "01001-000",
-  street: "Praça da Sé",
-  number: "1",
-  complement: "",
-  neighborhood: "Sé",
-  city: "São Paulo",
-  state: "SP",
-}
+import { STUB_BASE_VALUES } from "../stubs"
 
 describe("formatLocation", () => {
   it("should join all address parts when complement is empty", () => {
     // Arrange
-    const values: ReportFormValues = { ...BASE_VALUES, complement: "" }
+    const values: ReportFormValues = { ...STUB_BASE_VALUES, complement: "" }
 
     // Act
     const result = formatLocation(values)
@@ -27,7 +16,10 @@ describe("formatLocation", () => {
 
   it("should include complement when provided", () => {
     // Arrange
-    const values: ReportFormValues = { ...BASE_VALUES, complement: "Apto 42" }
+    const values: ReportFormValues = {
+      ...STUB_BASE_VALUES,
+      complement: "Apto 42",
+    }
 
     // Act
     const result = formatLocation(values)
@@ -40,7 +32,10 @@ describe("formatLocation", () => {
 
   it("should omit complement when undefined", () => {
     // Arrange
-    const values: ReportFormValues = { ...BASE_VALUES, complement: undefined }
+    const values: ReportFormValues = {
+      ...STUB_BASE_VALUES,
+      complement: undefined,
+    }
 
     // Act
     const result = formatLocation(values)
@@ -51,7 +46,7 @@ describe("formatLocation", () => {
 
   it("should format without number when number is empty or undefined", () => {
     // Arrange
-    const values: ReportFormValues = { ...BASE_VALUES, number: "" }
+    const values: ReportFormValues = { ...STUB_BASE_VALUES, number: "" }
 
     // Act
     const result = formatLocation(values)

@@ -1,11 +1,5 @@
 import { fetchAddressByCep } from "../index"
-
-const VALID_RESPONSE = {
-  logradouro: "Praça da Sé",
-  bairro: "Sé",
-  localidade: "São Paulo",
-  uf: "SP",
-}
+import { STUB_VALID_RESPONSE } from "../stubs"
 
 describe("fetchAddressByCep", () => {
   beforeEach(() => {
@@ -16,7 +10,7 @@ describe("fetchAddressByCep", () => {
     // Arrange
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(VALID_RESPONSE),
+      json: () => Promise.resolve(STUB_VALID_RESPONSE),
     } as Response)
 
     // Act
@@ -35,7 +29,7 @@ describe("fetchAddressByCep", () => {
     // Arrange
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(VALID_RESPONSE),
+      json: () => Promise.resolve(STUB_VALID_RESPONSE),
     } as Response)
 
     // Act
@@ -65,7 +59,7 @@ describe("fetchAddressByCep", () => {
     // Arrange
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ ...VALID_RESPONSE, erro: true }),
+      json: () => Promise.resolve({ ...STUB_VALID_RESPONSE, erro: true }),
     } as Response)
 
     // Act

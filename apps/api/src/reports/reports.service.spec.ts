@@ -1,57 +1,28 @@
 import { NotFoundException } from '@nestjs/common';
-import { LlmUnavailableError } from '@/core/errors';
-import {
-  AuditEvent,
-  IAuditLogger,
-  ILlmAnalyzer,
-  LlmAnalysisResult,
-} from '@/core/ports';
+import { LlmUnavailableError, LlmValidationError } from '@/core/errors';
+import { AuditEvent } from '@/core/ports';
 import { CreateReportDto } from '@/reports/dto/create-report.dto';
-import { Report } from '@/reports/entities/report.entity';
-import { ReportsRepository } from '@/reports/reports.repository';
+import {
+  buildMockAuditLogger,
+  buildMockLlmAnalyzer,
+  buildMockReportsRepository,
+} from '@/reports/mocks';
 import { ReportsService } from '@/reports/reports.service';
-
-const MOCK_REPORT: Report = {
-  id: 'uuid-123',
-  title: 'Buraco na rua',
-  description: 'Buraco enorme',
-  location: 'Rua X, 10',
-  category: 'Outros',
-  priority: 'Baixa',
-  technicalSummary: '',
-  createdAt: new Date(),
-};
-
-const MOCK_LLM_RESULT: LlmAnalysisResult = {
-  output: {
-    category: 'Via Pública',
-    priority: 'Alta',
-    technical_summary:
-      'Dano estrutural em via pública requer atenção imediata.',
-  },
-  rawResponse:
-    '{"category":"Via Pública","priority":"Alta","technical_summary":"..."}',
-  latencyMs: 350,
-};
+import { STUB_LLM_RESULT, STUB_REPORT } from '@/reports/stubs';
 
 describe('ReportsService', () => {
   let service: ReportsService;
-  let reportsRepository: jest.Mocked<ReportsRepository>;
-  let llmAnalyzer: jest.Mocked<ILlmAnalyzer>;
+  let reportsRepository: ReturnType<typeof buildMockReportsRepository>;
+  let llmAnalyzer: ReturnType<typeof buildMockLlmAnalyzer>;
   let createLogMock: jest.Mock;
-  let auditLogger: jest.Mocked<IAuditLogger>;
+  let auditLogger: ReturnType<typeof buildMockAuditLogger>['logger'];
 
   beforeEach(() => {
-    reportsRepository = {
-      save: jest.fn(),
-      findAll: jest.fn(),
-      findById: jest.fn(),
-    } as unknown as jest.Mocked<ReportsRepository>;
-
-    llmAnalyzer = { analyze: jest.fn() };
-    createLogMock = jest.fn();
-    auditLogger = { createLog: createLogMock };
-
+    reportsRepository = buildMockReportsRepository();
+    const audit = buildMockAuditLogger();
+    auditLogger = audit.logger;
+    createLogMock = audit.createLogMock;
+    llmAnalyzer = buildMockLlmAnalyzer();
     service = new ReportsService(reportsRepository, llmAnalyzer, auditLogger);
   });
 
@@ -65,13 +36,14 @@ describe('ReportsService', () => {
     it('should create report, call LLM, audit success, and return enriched DTO', async () => {
       // Arrange
       reportsRepository.save
-        .mockResolvedValueOnce(MOCK_REPORT)
         .mockResolvedValueOnce({
-          ...MOCK_REPORT,
-          category: 'Via Pública',
-          priority: 'Alta',
-        });
-      llmAnalyzer.analyze.mockResolvedValue(MOCK_LLM_RESULT);
+          ...STUB_REPORT,
+          category: 'Outros',
+          priority: 'Baixa',
+          technicalSummary: '',
+        })
+        .mockResolvedValueOnce(STUB_REPORT);
+      llmAnalyzer.analyze.mockResolvedValue(STUB_LLM_RESULT);
       createLogMock.mockResolvedValue(undefined);
 
       // Act
@@ -82,18 +54,18 @@ describe('ReportsService', () => {
       expect(result.priority).toBe('Alta');
       expect(createLogMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          reportId: MOCK_REPORT.id,
+          reportId: STUB_REPORT.id,
           promptSent: JSON.stringify(dto),
           eventType: AuditEvent.LLM_SUCCEEDED,
-          rawResponse: MOCK_LLM_RESULT.rawResponse,
-          latencyMs: MOCK_LLM_RESULT.latencyMs,
+          rawResponse: STUB_LLM_RESULT.rawResponse,
+          latencyMs: STUB_LLM_RESULT.latencyMs,
         }),
       );
     });
 
     it('should audit failure and rethrow when LLM throws LlmUnavailableError', async () => {
       // Arrange
-      reportsRepository.save.mockResolvedValue(MOCK_REPORT);
+      reportsRepository.save.mockResolvedValue(STUB_REPORT);
       llmAnalyzer.analyze.mockRejectedValue(new LlmUnavailableError());
       createLogMock.mockResolvedValue(undefined);
 
@@ -104,11 +76,27 @@ describe('ReportsService', () => {
       await expect(act()).rejects.toThrow(LlmUnavailableError);
       expect(createLogMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          reportId: MOCK_REPORT.id,
+          reportId: STUB_REPORT.id,
           promptSent: JSON.stringify(dto),
           eventType: AuditEvent.LLM_FAILED,
           errorMessage: 'LLM provider is temporarily unavailable',
         }),
+      );
+    });
+
+    it('should audit failure and rethrow when LLM throws LlmValidationError', async () => {
+      // Arrange
+      reportsRepository.save.mockResolvedValue(STUB_REPORT);
+      llmAnalyzer.analyze.mockRejectedValue(new LlmValidationError([]));
+      createLogMock.mockResolvedValue(undefined);
+
+      // Act
+      const act = () => service.create(dto);
+
+      // Assert
+      await expect(act()).rejects.toThrow(LlmValidationError);
+      expect(createLogMock).toHaveBeenCalledWith(
+        expect.objectContaining({ eventType: AuditEvent.LLM_FAILED }),
       );
     });
   });
@@ -116,7 +104,7 @@ describe('ReportsService', () => {
   describe('findAll', () => {
     it('should return list of report response DTOs', async () => {
       // Arrange
-      reportsRepository.findAll.mockResolvedValue([MOCK_REPORT]);
+      reportsRepository.findAll.mockResolvedValue([STUB_REPORT]);
 
       // Act
       const result = await service.findAll();
@@ -130,7 +118,7 @@ describe('ReportsService', () => {
   describe('findById', () => {
     it('should return report DTO when found', async () => {
       // Arrange
-      reportsRepository.findById.mockResolvedValue(MOCK_REPORT);
+      reportsRepository.findById.mockResolvedValue(STUB_REPORT);
 
       // Act
       const result = await service.findById('uuid-123');

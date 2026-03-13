@@ -1,57 +1,8 @@
-import type { UseMutationResult } from "@tanstack/react-query"
 import { render, screen, fireEvent } from "@testing-library/react"
-import type { FieldErrors, UseFormRegister } from "react-hook-form"
-import type { ViaCepAddress } from "@/services/viacep"
-import type { ReportFormValues } from "../../../../../../schemas/report.schema"
+import type { FieldErrors } from "react-hook-form"
+import type { ReportFormValues } from "@/features/reports/schemas/report.schema"
 import { LocationDetailedFields } from "../LocationDetailedFields"
-
-function buildMockRegister(): UseFormRegister<ReportFormValues> {
-  return jest
-    .fn()
-    .mockImplementation(
-      (
-        _name: string,
-        opts?: { onBlur?: () => void; onChange?: () => void },
-      ) => ({
-        name: _name,
-        onChange: opts?.onChange ?? jest.fn(),
-        onBlur: opts?.onBlur ?? jest.fn(),
-        ref: jest.fn(),
-      }),
-    ) as unknown as UseFormRegister<ReportFormValues>
-}
-
-function buildMockCepMutation(
-  overrides: Partial<UseMutationResult<ViaCepAddress, Error, string>> = {},
-): UseMutationResult<ViaCepAddress, Error, string> {
-  return {
-    isPending: false,
-    isSuccess: false,
-    isError: false,
-    isIdle: true,
-    data: undefined,
-    error: null,
-    mutate: jest.fn(),
-    mutateAsync: jest.fn(),
-    reset: jest.fn(),
-    status: "idle",
-    variables: undefined,
-    failureCount: 0,
-    failureReason: null,
-    submittedAt: 0,
-    context: undefined,
-    ...overrides,
-  } as unknown as UseMutationResult<ViaCepAddress, Error, string>
-}
-
-const DEFAULT_PROPS = {
-  register: buildMockRegister(),
-  errors: {} as FieldErrors<ReportFormValues>,
-  cepMutation: buildMockCepMutation(),
-  dirtyFields: {} as Partial<Record<keyof ReportFormValues, boolean>>,
-  onCepBlur: jest.fn(),
-  onCepChange: jest.fn(),
-}
+import { buildMockCepMutation, DEFAULT_PROPS } from "../mocks"
 
 describe("LocationDetailedFields", () => {
   it("should render all address fields", () => {

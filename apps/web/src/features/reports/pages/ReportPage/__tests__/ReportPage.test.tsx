@@ -1,13 +1,18 @@
 "use client"
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { screen, waitFor, fireEvent } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { fetchAddressByCep } from "@/services/viacep"
-import { createReport } from "../../../requests/create-report"
-import { ReportPage } from "../ReportPage"
+import { createReport } from "@/features/reports/requests/create-report"
+import { STUB_ADDRESS, STUB_REPORT } from "@/features/reports/testing/stubs"
+import {
+  fillRequiredFields,
+  getSubmitForm,
+  renderWithProviders,
+  switchToDetailedLocation,
+} from "../mocks"
 
-jest.mock("../../../requests/create-report")
+jest.mock("@/features/reports/requests/create-report")
 jest.mock("@/services/viacep")
 
 const mockCreateReport = createReport as jest.MockedFunction<
@@ -17,70 +22,10 @@ const mockFetchAddressByCep = fetchAddressByCep as jest.MockedFunction<
   typeof fetchAddressByCep
 >
 
-const MOCK_REPORT = {
-  id: "uuid-001",
-  title: "Buraco na calçada",
-  description: "Há um buraco enorme e perigoso na calçada principal.",
-  location: "Praça da Sé, 10, Sé, São Paulo - SP, CEP 01001-000",
-  category: "Via Pública",
-  priority: "Alta" as const,
-  technicalSummary: "Irregularidade no pavimento com risco de queda.",
-  createdAt: "2026-03-12T00:00:00.000Z",
-}
-
-const MOCK_ADDRESS = {
-  street: "Praça da Sé",
-  neighborhood: "Sé",
-  city: "São Paulo",
-  state: "SP",
-}
-
-function renderWithProviders() {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      mutations: { retry: false },
-      queries: { retry: false },
-    },
-  })
-  return render(
-    <QueryClientProvider client={queryClient}>
-      <ReportPage />
-    </QueryClientProvider>,
-  )
-}
-
-function getSubmitForm() {
-  return screen.getByRole("button", { name: /enviar/i }).closest("form")!
-}
-
-function switchToDetailedLocation() {
-  fireEvent.click(
-    screen.getByRole("button", { name: /usar endereço detalhado/i }),
-  )
-}
-
-async function fillRequiredFields() {
-  await userEvent.type(screen.getByLabelText(/título/i), "Buraco na calçada")
-  await userEvent.type(
-    screen.getByLabelText(/descrição do problema/i),
-    "Há um buraco enorme e perigoso na calçada principal.",
-  )
-  switchToDetailedLocation()
-  // fireEvent.change bypasses the CEP mask handler and directly updates RHF state
-  fireEvent.change(screen.getByLabelText(/cep/i), {
-    target: { value: "01001-000" },
-  })
-  await userEvent.type(screen.getByLabelText(/número/i), "10")
-  await userEvent.type(screen.getByLabelText(/rua/i), "Praça da Sé")
-  await userEvent.type(screen.getByLabelText(/bairro/i), "Sé")
-  await userEvent.type(screen.getByLabelText(/cidade/i), "São Paulo")
-  await userEvent.type(screen.getByLabelText(/uf/i), "SP")
-}
-
 describe("ReportPage", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockFetchAddressByCep.mockResolvedValue(MOCK_ADDRESS)
+    mockFetchAddressByCep.mockResolvedValue(STUB_ADDRESS)
   })
 
   describe("given the citizen opens the form", () => {
@@ -126,7 +71,7 @@ describe("ReportPage", () => {
 
     it("should display the AI-enriched report after successful submission", async () => {
       // Arrange
-      mockCreateReport.mockResolvedValue(MOCK_REPORT)
+      mockCreateReport.mockResolvedValue(STUB_REPORT)
       renderWithProviders()
       await fillRequiredFields()
 
@@ -139,11 +84,13 @@ describe("ReportPage", () => {
           screen.getByText("Ocorrência registrada com sucesso!"),
         ).toBeInTheDocument()
       })
-      expect(screen.getByText("uuid-001")).toBeInTheDocument()
+      expect(screen.getByText("abc-123")).toBeInTheDocument()
       expect(screen.getByText("Via Pública")).toBeInTheDocument()
       expect(screen.getByText("Prioridade Alta")).toBeInTheDocument()
       expect(
-        screen.getByText("Irregularidade no pavimento com risco de queda."),
+        screen.getByText(
+          "Irregularidade no pavimento que representa risco à segurança.",
+        ),
       ).toBeInTheDocument()
     })
   })
@@ -241,7 +188,7 @@ describe("ReportPage", () => {
 
     it("should submit with the free-text location when the form is valid", async () => {
       // Arrange
-      mockCreateReport.mockResolvedValue(MOCK_REPORT)
+      mockCreateReport.mockResolvedValue(STUB_REPORT)
       renderWithProviders()
       switchToDetailedLocation()
       fireEvent.click(screen.getByRole("button", { name: /usar texto livre/i }))
@@ -271,7 +218,7 @@ describe("ReportPage", () => {
   describe("given the citizen completes a submission and wants to report again", () => {
     it("should reset the form when clicking 'Registrar nova ocorrência'", async () => {
       // Arrange
-      mockCreateReport.mockResolvedValue(MOCK_REPORT)
+      mockCreateReport.mockResolvedValue(STUB_REPORT)
       renderWithProviders()
       await fillRequiredFields()
       fireEvent.submit(getSubmitForm())

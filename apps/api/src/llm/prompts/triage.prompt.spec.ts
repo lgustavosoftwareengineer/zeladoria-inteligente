@@ -1,27 +1,21 @@
 import { CATEGORIES, PRIORITIES } from '@/core/domain';
 import { buildTriagePrompt } from '@/llm/prompts/triage.prompt';
-import type { ReportInput } from '@/core/ports';
+import { STUB_REPORT_INPUT } from '@/llm/stubs';
 
 describe('buildTriagePrompt', () => {
-  const mockInput: ReportInput = {
-    title: 'Buraco na rua',
-    description: 'Tem um buraco enorme na frente da minha casa',
-    location: 'Rua das Flores, 42',
-  };
-
   it('should interpolate all three input fields into the prompt', () => {
     // Arrange & Act
-    const prompt = buildTriagePrompt(mockInput);
+    const prompt = buildTriagePrompt(STUB_REPORT_INPUT);
 
     // Assert
-    expect(prompt).toContain(mockInput.title);
-    expect(prompt).toContain(mockInput.description);
-    expect(prompt).toContain(mockInput.location);
+    expect(prompt).toContain(STUB_REPORT_INPUT.title);
+    expect(prompt).toContain(STUB_REPORT_INPUT.description);
+    expect(prompt).toContain(STUB_REPORT_INPUT.location);
   });
 
   it('should include all valid CATEGORIES values in the prompt', () => {
     // Arrange & Act
-    const prompt = buildTriagePrompt(mockInput);
+    const prompt = buildTriagePrompt(STUB_REPORT_INPUT);
 
     // Assert
     CATEGORIES.forEach((category) => {
@@ -31,7 +25,7 @@ describe('buildTriagePrompt', () => {
 
   it('should include all valid PRIORITIES values in the prompt', () => {
     // Arrange & Act
-    const prompt = buildTriagePrompt(mockInput);
+    const prompt = buildTriagePrompt(STUB_REPORT_INPUT);
 
     // Assert
     PRIORITIES.forEach((priority) => {
@@ -41,7 +35,7 @@ describe('buildTriagePrompt', () => {
 
   it('should instruct the model to return only JSON without markdown', () => {
     // Arrange & Act
-    const prompt = buildTriagePrompt(mockInput);
+    const prompt = buildTriagePrompt(STUB_REPORT_INPUT);
 
     // Assert
     expect(prompt).toContain('EXCLUSIVAMENTE');

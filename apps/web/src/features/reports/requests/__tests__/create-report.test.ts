@@ -1,22 +1,5 @@
-import type { CreateReportDto, ReportResponse } from "../../types/report.types"
+import { STUB_DTO, STUB_RESPONSE } from "@/features/reports/testing/stubs"
 import { createReport } from "../create-report"
-
-const MOCK_DTO: CreateReportDto = {
-  title: "Buraco na rua",
-  description: "Há um buraco enorme na calçada.",
-  location: "Praça da Sé, 1, Sé, São Paulo - SP, CEP 01001-000",
-}
-
-const MOCK_RESPONSE: ReportResponse = {
-  id: "abc-123",
-  title: "Buraco na rua",
-  description: "Há um buraco enorme na calçada.",
-  location: "Praça da Sé, 1, Sé, São Paulo - SP, CEP 01001-000",
-  category: "Via Pública",
-  priority: "Alta",
-  technicalSummary: "Irregularidade no pavimento.",
-  createdAt: "2026-03-12T00:00:00.000Z",
-}
 
 describe("createReport", () => {
   beforeEach(() => {
@@ -27,25 +10,25 @@ describe("createReport", () => {
     // Arrange
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(MOCK_RESPONSE),
+      json: () => Promise.resolve(STUB_RESPONSE),
     } as Response)
 
     // Act
-    const result = await createReport(MOCK_DTO)
+    const result = await createReport(STUB_DTO)
 
     // Assert
-    expect(result).toEqual(MOCK_RESPONSE)
+    expect(result).toEqual(STUB_RESPONSE)
   })
 
   it("should POST to /api/reports with JSON body", async () => {
     // Arrange
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve(MOCK_RESPONSE),
+      json: () => Promise.resolve(STUB_RESPONSE),
     } as Response)
 
     // Act
-    await createReport(MOCK_DTO)
+    await createReport(STUB_DTO)
 
     // Assert
     expect(fetch).toHaveBeenCalledWith(
@@ -53,7 +36,7 @@ describe("createReport", () => {
       expect.objectContaining({
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(MOCK_DTO),
+        body: JSON.stringify(STUB_DTO),
       }),
     )
   })
@@ -66,7 +49,7 @@ describe("createReport", () => {
     } as Response)
 
     // Act
-    const act = () => createReport(MOCK_DTO)
+    const act = () => createReport(STUB_DTO)
 
     // Assert
     await expect(act()).rejects.toThrow("Serviço de IA indisponível.")
@@ -80,7 +63,7 @@ describe("createReport", () => {
     } as Response)
 
     // Act
-    const act = () => createReport(MOCK_DTO)
+    const act = () => createReport(STUB_DTO)
 
     // Assert
     await expect(act()).rejects.toThrow("Serviço temporariamente indisponível.")

@@ -1,20 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { LlmUnavailableError } from '@/core/errors';
-import { ReportResponseDto } from '@/reports/dto/report-response.dto';
 import { ReportsController } from '@/reports/reports.controller';
 import { ReportsService } from '@/reports/reports.service';
-
-const MOCK_DTO: ReportResponseDto = {
-  id: 'uuid-123',
-  title: 'Buraco na rua',
-  description: 'Buraco enorme',
-  location: 'Rua X, 10',
-  category: 'Via Pública',
-  priority: 'Alta',
-  technicalSummary: 'Dano estrutural identificado.',
-  createdAt: new Date(),
-};
+import { STUB_REPORT_RESPONSE_DTO } from '@/reports/stubs';
 
 describe('ReportsController', () => {
   let controller: ReportsController;
@@ -44,7 +33,7 @@ describe('ReportsController', () => {
   describe('create', () => {
     it('should call service.create and return the result', async () => {
       // Arrange
-      createMock.mockResolvedValue(MOCK_DTO);
+      createMock.mockResolvedValue(STUB_REPORT_RESPONSE_DTO);
       const body = {
         title: 'Buraco',
         description: 'Enorme',
@@ -56,7 +45,7 @@ describe('ReportsController', () => {
 
       // Assert
       expect(createMock).toHaveBeenCalledWith(body);
-      expect(result).toEqual(MOCK_DTO);
+      expect(result).toEqual(STUB_REPORT_RESPONSE_DTO);
     });
 
     it('should propagate LlmUnavailableError from service', async () => {
@@ -75,27 +64,27 @@ describe('ReportsController', () => {
   describe('findAll', () => {
     it('should return array of reports from service', async () => {
       // Arrange
-      service.findAll.mockResolvedValue([MOCK_DTO]);
+      service.findAll.mockResolvedValue([STUB_REPORT_RESPONSE_DTO]);
 
       // Act
       const result = await controller.findAll();
 
       // Assert
       expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('uuid-123');
+      expect(result[0].id).toBe(STUB_REPORT_RESPONSE_DTO.id);
     });
   });
 
   describe('findById', () => {
     it('should return a single report', async () => {
       // Arrange
-      service.findById.mockResolvedValue(MOCK_DTO);
+      service.findById.mockResolvedValue(STUB_REPORT_RESPONSE_DTO);
 
       // Act
       const result = await controller.findById('uuid-123');
 
       // Assert
-      expect(result.id).toBe('uuid-123');
+      expect(result.id).toBe(STUB_REPORT_RESPONSE_DTO.id);
     });
 
     it('should propagate NotFoundException when service throws', async () => {

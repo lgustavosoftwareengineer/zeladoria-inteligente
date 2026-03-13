@@ -1,48 +1,29 @@
-import { ConfigService } from '@nestjs/config';
 import { AuditEvent } from '@/core/ports';
-import { AuditRepository } from '@/audit/audit.repository';
 import { AuditService } from '@/audit/audit.service';
-import { AuditLog } from '@/audit/entities/audit-log.entity';
-
-const MOCK_AUDIT_LOG: AuditLog = {
-  id: 'audit-uuid-1',
-  reportId: 'report-uuid-1',
-  eventType: AuditEvent.LLM_SUCCEEDED,
-  provider: 'openrouter',
-  model: 'google/gemini-2.5-flash',
-  promptSent: 'test prompt',
-  rawResponse: '{"category":"Via Pública"}',
-  errorMessage: null,
-  latencyMs: 300,
-  createdAt: new Date(),
-};
+import {
+  buildMockAuditRepository,
+  buildMockConfigService,
+} from '@/audit/mocks';
+import { STUB_AUDIT_LOG } from '@/audit/stubs';
 
 describe('AuditService', () => {
   let service: AuditService;
-  let repository: jest.Mocked<AuditRepository>;
+  let repository: ReturnType<typeof buildMockAuditRepository>['repository'];
   let saveMock: jest.Mock;
-  let configService: jest.Mocked<ConfigService>;
+  let configService: ReturnType<typeof buildMockConfigService>;
 
   beforeEach(() => {
-    saveMock = jest.fn();
-    repository = {
-      save: saveMock,
-      findByReportId: jest.fn(),
-    } as unknown as jest.Mocked<AuditRepository>;
-
-    configService = {
-      get: jest.fn((key: string) =>
-        key === 'LLM_PROVIDER_NAME' ? 'openrouter' : 'google/gemini-2.5-flash',
-      ),
-    } as unknown as jest.Mocked<ConfigService>;
-
+    const repo = buildMockAuditRepository();
+    repository = repo.repository;
+    saveMock = repo.saveMock;
+    configService = buildMockConfigService();
     service = new AuditService(repository, configService);
   });
 
   describe('createLog', () => {
     it('should persist audit log with correct fields on LLM success', async () => {
       // Arrange
-      saveMock.mockResolvedValue(MOCK_AUDIT_LOG);
+      saveMock.mockResolvedValue(STUB_AUDIT_LOG);
 
       // Act
       await service.createLog({
@@ -68,7 +49,7 @@ describe('AuditService', () => {
     it('should persist error message and null latency on LLM failure', async () => {
       // Arrange
       saveMock.mockResolvedValue({
-        ...MOCK_AUDIT_LOG,
+        ...STUB_AUDIT_LOG,
         eventType: AuditEvent.LLM_FAILED,
       });
 

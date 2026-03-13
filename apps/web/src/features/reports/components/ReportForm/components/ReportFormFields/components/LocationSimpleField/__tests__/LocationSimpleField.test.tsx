@@ -1,16 +1,6 @@
 import { render, screen } from "@testing-library/react"
-import type { UseFormRegister } from "react-hook-form"
-import type { ReportFormValues } from "../../../../../../schemas/report.schema"
+import { buildMockRegister } from "@/features/reports/testing/mocks"
 import { LocationSimpleField } from "../LocationSimpleField"
-
-function buildMockRegister(): UseFormRegister<ReportFormValues> {
-  return jest.fn().mockReturnValue({
-    name: "locationText",
-    onChange: jest.fn(),
-    onBlur: jest.fn(),
-    ref: jest.fn(),
-  }) as unknown as UseFormRegister<ReportFormValues>
-}
 
 describe("LocationSimpleField", () => {
   it("should render the location textarea with placeholder", () => {

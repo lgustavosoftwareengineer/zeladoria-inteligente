@@ -4,24 +4,12 @@ import {
   reportSchema,
 } from "../report.schema"
 import type { ReportFormValues } from "../report.schema"
-
-const VALID_DETAILED_VALUES: ReportFormValues = {
-  title: "Buraco na rua",
-  description: "Há um buraco enorme na calçada.",
-  locationText: "",
-  cep: "01001-000",
-  street: "Praça da Sé",
-  number: "1",
-  complement: "",
-  neighborhood: "Sé",
-  city: "São Paulo",
-  state: "SP",
-}
+import { STUB_DETAILED_VALUES } from "../stubs"
 
 describe("reportSchema", () => {
   it("should pass with valid values", () => {
     // Act
-    const result = reportSchema.safeParse(VALID_DETAILED_VALUES)
+    const result = reportSchema.safeParse(STUB_DETAILED_VALUES)
 
     // Assert
     expect(result.success).toBe(true)
@@ -29,7 +17,7 @@ describe("reportSchema", () => {
 
   it("should fail when title is shorter than 3 characters", () => {
     // Arrange
-    const values = { ...VALID_DETAILED_VALUES, title: "Ab" }
+    const values = { ...STUB_DETAILED_VALUES, title: "Ab" }
 
     // Act
     const result = reportSchema.safeParse(values)
@@ -43,7 +31,7 @@ describe("reportSchema", () => {
 
   it("should fail when description is shorter than 10 characters", () => {
     // Arrange
-    const values = { ...VALID_DETAILED_VALUES, description: "Curta" }
+    const values = { ...STUB_DETAILED_VALUES, description: "Curta" }
 
     // Act
     const result = reportSchema.safeParse(values)
@@ -57,7 +45,7 @@ describe("reportSchema", () => {
 
   it("should fail with invalid CEP format", () => {
     // Arrange
-    const values = { ...VALID_DETAILED_VALUES, cep: "123" }
+    const values = { ...STUB_DETAILED_VALUES, cep: "123" }
 
     // Act
     const result = reportSchema.safeParse(values)
@@ -71,7 +59,7 @@ describe("reportSchema", () => {
 
   it("should accept CEP without hyphen", () => {
     // Arrange
-    const values = { ...VALID_DETAILED_VALUES, cep: "01001000" }
+    const values = { ...STUB_DETAILED_VALUES, cep: "01001000" }
 
     // Act
     const result = reportSchema.safeParse(values)
@@ -82,7 +70,7 @@ describe("reportSchema", () => {
 
   it("should fail when a required address field is empty", () => {
     // Arrange
-    const values = { ...VALID_DETAILED_VALUES, street: "" }
+    const values = { ...STUB_DETAILED_VALUES, street: "" }
 
     // Act
     const result = reportSchema.safeParse(values)
@@ -97,7 +85,7 @@ describe("reportSchema", () => {
   it("should allow complement and locationText to be optional", () => {
     // Arrange
     const values = {
-      ...VALID_DETAILED_VALUES,
+      ...STUB_DETAILED_VALUES,
       complement: undefined,
       locationText: undefined,
     }
@@ -112,7 +100,7 @@ describe("reportSchema", () => {
   it("should allow number to be optional (street and neighborhood only)", () => {
     // Arrange
     const values = {
-      ...VALID_DETAILED_VALUES,
+      ...STUB_DETAILED_VALUES,
       number: "",
     }
 
@@ -128,7 +116,7 @@ describe("reportResolver (detailed mode)", () => {
   it("should return data when values are valid", async () => {
     // Act
     const result = await reportResolver(
-      VALID_DETAILED_VALUES,
+      STUB_DETAILED_VALUES,
       undefined,
       {} as never,
     )
@@ -140,7 +128,7 @@ describe("reportResolver (detailed mode)", () => {
 
   it("should return errors keyed by field path when values are invalid", async () => {
     // Arrange
-    const invalidValues = { ...VALID_DETAILED_VALUES, title: "Ab", cep: "123" }
+    const invalidValues = { ...STUB_DETAILED_VALUES, title: "Ab", cep: "123" }
 
     // Act
     const result = await reportResolver(
@@ -162,7 +150,7 @@ describe("buildReportResolver('simple')", () => {
   it("should pass with title, description and locationText — without address fields", async () => {
     // Arrange
     const values: ReportFormValues = {
-      ...VALID_DETAILED_VALUES,
+      ...STUB_DETAILED_VALUES,
       locationText: "Praça da Sé, próximo ao metrô",
       cep: "",
       street: "",
@@ -182,7 +170,7 @@ describe("buildReportResolver('simple')", () => {
   it("should fail when locationText is too short", async () => {
     // Arrange
     const values: ReportFormValues = {
-      ...VALID_DETAILED_VALUES,
+      ...STUB_DETAILED_VALUES,
       locationText: "Ru",
       cep: "",
       street: "",
@@ -202,7 +190,7 @@ describe("buildReportResolver('simple')", () => {
   it("should fail when locationText is empty", async () => {
     // Arrange
     const values: ReportFormValues = {
-      ...VALID_DETAILED_VALUES,
+      ...STUB_DETAILED_VALUES,
       locationText: "",
       cep: "",
       street: "",

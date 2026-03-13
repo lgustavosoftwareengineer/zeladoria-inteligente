@@ -1,4 +1,4 @@
-import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import {
   LlmParseError,
   LlmUnavailableError,
@@ -11,23 +11,20 @@ import {
   MESSAGE_LLM_UNAVAILABLE,
   MESSAGE_LLM_VALIDATION_FAILED,
 } from '@/core/filters/global-exception.filter';
+import { buildMockArgumentsHost } from '@/core/filters/mocks';
 
 describe('GlobalExceptionFilter', () => {
   let filter: GlobalExceptionFilter;
-  let host: ArgumentsHost;
+  let host: ReturnType<typeof buildMockArgumentsHost>['host'];
   let statusMock: jest.Mock;
   let jsonMock: jest.Mock;
 
   beforeEach(() => {
     filter = new GlobalExceptionFilter();
-    jsonMock = jest.fn();
-    statusMock = jest.fn().mockReturnValue({ json: jsonMock });
-    host = {
-      switchToHttp: () => ({
-        getResponse: () => ({ status: statusMock }),
-        getRequest: () => ({ method: 'POST', url: '/api/reports' }),
-      }),
-    } as unknown as ArgumentsHost;
+    const { host: h, statusMock: s, jsonMock: j } = buildMockArgumentsHost();
+    host = h;
+    statusMock = s;
+    jsonMock = j;
   });
 
   it('should return 503 for LlmUnavailableError', () => {
