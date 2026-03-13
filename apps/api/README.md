@@ -27,7 +27,7 @@ graph TB
         Config["config/<br/>Zod env validation"]
         Domain["domain/<br/>Category · Priority"]
         Errors["errors/<br/>LlmParseError<br/>LlmValidationError<br/>LlmUnavailableError"]
-        Ports["ports/<br/>ILlmAnalyzer<br/>IAuditLogger"]
+        Ports["ports/<br/>ILlmAnalyzer<br/>IAuditLogger<br/>IConfigReader"]
         Filter["filters/<br/>GlobalExceptionFilter"]
         DB["database/<br/>TypeORM async config"]
     end
@@ -159,7 +159,7 @@ Infraestrutura compartilhada — nenhum módulo de feature importa de outro.
 | `config/`   | Valida `process.env` com Zod na inicialização (fail-fast)                                                                           |
 | `domain/`   | Enums `Category` e `Priority` + arrays `CATEGORIES`/`PRIORITIES` — fonte única da verdade compartilhada com o prompt e o schema Zod |
 | `errors/`   | `LlmParseError`, `LlmValidationError`, `LlmUnavailableError`                                                                        |
-| `ports/`    | Interfaces `ILlmAnalyzer` e `IAuditLogger` com tokens de injeção                                                                    |
+| `ports/`    | Interfaces `ILlmAnalyzer`, `IAuditLogger` e `IConfigReader` com tokens de injeção                                                   |
 | `filters/`  | `GlobalExceptionFilter` — mapeia erros customizados para HTTP                                                                       |
 | `database/` | Configuração assíncrona do TypeORM                                                                                                  |
 
