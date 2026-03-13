@@ -37,6 +37,10 @@ src/
 ├── features/
 │   └── reports/
 │       ├── index.ts        # PUBLIC API — único arquivo que código externo importa
+│       ├── pages/
+│       │   └── ReportPage/              # página da feature (layout + ReportForm)
+│       │       ├── ReportPage.tsx
+│       │       └── index.ts
 │       ├── components/
 │       │   └── ReportForm/              # componente público da feature
 │       │       ├── ReportForm.tsx
@@ -85,9 +89,13 @@ graph TB
     Page["app/page.tsx"]
 
     subgraph feature["features/reports (public API)"]
-        Index["index.ts<br/>(exports ReportForm)"]
+        Index["index.ts<br/>(exports ReportPage, ReportForm)"]
 
-        subgraph ReportForm["ReportForm/"]
+        subgraph ReportPage["pages/ReportPage/"]
+            RP["ReportPage.tsx<br/>layout da página: título, descrição, card"]
+        end
+
+        subgraph ReportForm["components/ReportForm/"]
             RF["ReportForm.tsx<br/>orquestra estados: idle / loading / success"]
             Hook["use-report-form.ts<br/>React Hook Form + TanStack Query"]
 
@@ -121,7 +129,8 @@ graph TB
     end
 
     Page --> Index
-    Index --> RF
+    Index --> RP
+    RP --> RF
     RF --> Hook
     RF --> RFF
     RF --> RFL
@@ -209,6 +218,10 @@ sequenceDiagram
 ### `reports/`
 
 Vertical slice completo para submissão e exibição de relatos.
+
+#### `pages/ReportPage` — página da feature
+
+Componente de página que expõe o fluxo de relatos: layout (título, descrição, card) e renderização do `ReportForm`. A rota Next.js (`app/page.tsx`) importa apenas `ReportPage` de `@/features/reports`.
 
 #### `useReportForm` — hook central
 
