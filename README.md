@@ -24,7 +24,7 @@ Sistema de triagem inteligente de relatos urbanos. Cidadãos descrevem um proble
 | Frontend       | Next.js 15, TypeScript, Tailwind CSS, TanStack Query |
 | Backend        | NestJS, TypeScript strict, TypeORM                   |
 | Banco de dados | PostgreSQL via Supabase (free tier)                  |
-| IA             | OpenRouter → `google/gemini-2.5-flash` |
+| IA             | OpenRouter → `google/gemini-2.5-flash`               |
 | Validação      | Zod (LLM + env) · class-validator (DTOs HTTP)        |
 | Infra          | Terraform · AWS Lambda + API Gateway + SSM           |
 | Deploy         | Vercel (frontend) · AWS Lambda (backend)             |
@@ -125,7 +125,9 @@ npm install
 
 > Para um guia visual passo a passo, consulte a [documentação oficial da OpenRouter](https://openrouter.ai/docs/api-keys).
 
-> **Aviso:** Para conseguir fazer requisições à OpenRouter, pode ser necessário ter créditos na conta. Verifique no [dashboard da OpenRouter](https://openrouter.ai/credits) a política de uso e créditos do modelo escolhido.
+> **Aviso:** A necessidade de créditos na OpenRouter depende do modelo escolhido. Há modelos gratuitos (ex.: Llama 3, Qwen, DeepSeek R1) e outros que consomem créditos. Consulte o [dashboard da OpenRouter](https://openrouter.ai/credits) e a [lista de modelos](https://openrouter.ai/models) para ver a política de cada um.
+
+> **Modelos gratuitos:** Para testar sem créditos, defina `OPENROUTER_MODEL` no `apps/api/.env` com um modelo free, por exemplo: `meta-llama/llama-3.3-70b-instruct:free`.
 
 ### Rodando a API
 
