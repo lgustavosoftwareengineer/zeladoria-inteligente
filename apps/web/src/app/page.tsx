@@ -6,7 +6,7 @@ export default function Home() {
       <div className="w-full max-w-lg">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-gray-900">
-            Zeladoria Inteligente 📞
+            📞 Zeladoria Inteligente
           </h1>
           <p className="mt-2 text-sm text-gray-500">
             Mande aqui o problema urbano que está acontecendo pertinho de você e
